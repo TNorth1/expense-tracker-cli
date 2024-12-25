@@ -1,3 +1,5 @@
 {
-    "file_storage_directory": "NOT_SET"
+    "storageDirectory": {
+        "directory": "NOT_SET"
+    }
 }

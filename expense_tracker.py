@@ -1,10 +1,14 @@
 import json
 import os
 import argparse
+from datetime import datetime
+import re
 
 parser = argparse.ArgumentParser(description="Expense tracker")
 parser.add_argument('-s', '--set-storage-directory', action='store_true',
                     help="Set the directory to store expense reports in")
+parser.add_argument('-c', '--create-new-report', type=str, required=False,
+                    help="Create a new expense report with the specified filename")
 
 args = parser.parse_args()
 
@@ -75,3 +79,87 @@ class Config:
             print("Config file does not exist")
         else:
             return config["storageDirectory"]["directory"]
+
+
+class ExpenseReport:
+
+    @staticmethod
+    def create_report():
+        """Create a new expense report with headers"""
+        storage_directory = Config.get_storage_directory()
+        file_name = f"{args.create_new_report}.json"
+        path = f"{storage_directory}/{file_name}"
+
+        headers = {
+            "Date": [],
+            "Breakfast": [],
+            "Lunch": [],
+            "Dinner": [],
+            "Total": [],
+            "Claimable Total": []
+        }
+
+        with open(path, 'w') as expense_report:
+            json.dump(headers, expense_report, indent=4)
+
+
+class UserInput:
+
+    @staticmethod
+    def is_valid_date(date_str):
+        """Validate user input for date in the format dd/mm/yyyy"""
+        try:
+            datetime.strptime(date_str, "%d/%m/%Y")
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
+    def is_valid_monetary_value(value_str):
+        """Checks if a string is a valid monetary value (integer or float with up two decimal places)"""
+        return re.match(r'^\d+(\.\d{2})?$', value_str) is not None
+
+    @staticmethod
+    def get_meal_cost(meal):
+        """
+        Prompt the user to input the cost of a specified meal.
+        The input is validated to ensure it is either an integer or a float with exactly 2 decimal places.
+        """
+        while True:
+            meal_cost = input(f"Enter the cost of {meal}: ")
+            if UserInput.is_valid_monetary_value(meal_cost):
+                meal_cost = float(meal_cost)
+                break
+            else:
+                print("Enter a valid monetary value i.e. '10' or '10.01' NOT '10.1'")
+
+        return meal_cost
+
+    @staticmethod
+    def get_report_data():
+        """Get the expense report data from user input"""
+        while True:
+            date = input(
+                "Enter the date of the expense DD/MM/YYYY (Leave blank to select today's date): ")
+            if UserInput.is_valid_date(date):
+                break
+            # If user input is left blank, use today's date
+            elif date.strip() == "":
+                date = datetime.today().strftime('%d/%m/%Y')
+                break
+            else:
+                print("Enter a valid date - DD/MM/YYYY")
+
+        breakfast_cost = UserInput.get_meal_cost("breakfast")
+        lunch_cost = UserInput.get_meal_cost("lunch")
+        dinner_cost = UserInput.get_meal_cost("dinner")
+
+        total = breakfast_cost + lunch_cost + dinner_cost
+
+        # 30 is a place holder for now. TODO make claimable total a setting in config.json
+        if total > 30:
+            claimable_total = 30
+        else:
+            claimable_total = total
+
+        return date, breakfast_cost, lunch_cost, dinner_cost, total, claimable_total

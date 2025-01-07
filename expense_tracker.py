@@ -4,27 +4,43 @@ import argparse
 from datetime import datetime
 import re
 
-parser = argparse.ArgumentParser(description="Expense tracker")
-parser.add_argument('-s', '--set-storage-directory', action='store_true',
-                    help="Set the directory to store expense reports in")
-parser.add_argument('-c', '--create-new-report', type=str, required=False,
-                    help="Create a new expense report with the specified filename")
 
-args = parser.parse_args()
+def is_valid_arg_amount(value):
+    """Validates input for '--set-max-claimable-amount' option ensuring it's a monetary value"""
+    # if provided argument is not a valid monetary value, raise error
+    if re.match(r'^\d+(\.\d{2})?$', value) is None:
+        raise argparse.ArgumentTypeError(
+            f"{value} is an invalid value. Enter a valid monetary value i.e. '10' or '10.01' NOT '10.1'")
+    return float(value)
+
+
+def parse_arguments():
+    """Parses command line arguments"""
+    parser = argparse.ArgumentParser(description="Expense tracker")
+    parser.add_argument('-s', '--set-storage-directory', action='store_true',
+                        help="Set the directory to store expense reports in")
+    parser.add_argument('-c', '--create-new-report', type=str, required=False,
+                        help="Create a new expense report with the specified filename")
+    parser.add_argument('-m', '--set-max-claimable-amount', type=is_valid_arg_amount, required=False,
+                        help="Set the daily maximum amount allowed to be claimed")
+    return parser.parse_args()
+
+
+ARGS = parse_arguments()
 
 
 class Config:
     CONFIG_PATH = "config.json"
-    DEFAULT_DIRECTORY = "NOT_SET"
-    DEFAULT_CONFIG_DATA = {
-        "storageDirectory": {
-            "directory": "NOT_SET"
-        }
+    DEFAULT_CONFIG_VALUE = "NOT_SET"
+    DEFAULT_CONFIG_SETTINGS = {
+        "report_storage_directory": DEFAULT_CONFIG_VALUE,
+        "max_claimable_amount": DEFAULT_CONFIG_VALUE
     }
 
     @staticmethod
     def load_config():
-        """Loads the config.json file.
+        """
+        Loads the config.json file.
         Returns the config data if the file exists.
         Returns None if the file does not exist.
         """
@@ -41,44 +57,65 @@ class Config:
             json.dump(config_data, config_file, indent=4)
 
     @staticmethod
+    def set_default_config_settings():
+        """Sets the config.json file to default settings"""
+        config = Config.DEFAULT_CONFIG_SETTINGS
+        Config.save_config(config)
+
+    @staticmethod
     def prompt_for_directory():
-        """Prompt the user to input a valid directory path.
+        """
+        Prompt the user to input a valid directory path.
         Returns the Directory if it is valid.
         """
         while True:
             directory = input("Set the directory to store expense reports: ")
             if os.path.isdir(directory):
                 return directory
-            else:
-                print(
-                    "Directory does not exist, please try again or create the directory")
+            print("Directory does not exist, please try again or create the directory")
 
     @staticmethod
     def set_storage_directory():
         """Sets the storage directory if certain conditions are met."""
-        # Create config.json with default values, if it doesn't exist
-        config = Config.load_config()
-        if config is None:
-            config = Config.DEFAULT_CONFIG_DATA
-            Config.save_config(config)
+        # Create config.json with default settings if it doesn't exist
+        config = Config.load_config()  # TODO this is place holder...
+        if config is None:  # ... this logic will go in the main loop
+            Config.set_default_config_settings()
+            config = Config.load_config()  # Load config again after resetting to default
 
+        current_storage_directory = config["report_storage_directory"]
         # Update storage directory path with users input if conditions are met
-        if (config["storageDirectory"].get("directory") == Config.DEFAULT_DIRECTORY or
-                not os.path.isdir(config["storageDirectory"].get("directory")) or
-                args.set_storage_directory):
-            config["storageDirectory"]["directory"] = Config.prompt_for_directory()
+        # TODO the conditional check is place holder, it will go in the main loop
+
+        if (current_storage_directory == Config.DEFAULT_CONFIG_VALUE or
+                not os.path.isdir(current_storage_directory) or
+                ARGS.set_storage_directory):
+            config["report_storage_directory"] = Config.prompt_for_directory()
             Config.save_config(config)
 
     @staticmethod
     def get_storage_directory():
         """Returns the storage directory path for expense reports"""
-        try:
-            with open(Config.CONFIG_PATH, "r") as config_file:
-                config = json.load(config_file)
-        except FileNotFoundError:
-            print("Config file does not exist")
+        config = Config.load_config()
+        return config["report_storage_directory"]
+
+    @staticmethod
+    def get_max_claimable_amount():
+        """Returns the daily maximum amount allowed to be claimed in the expense report"""
+        config = Config.load_config()
+        return config["max_claimable_amount"]
+
+    @staticmethod
+    def set_max_claimable_amount():
+        """Set the daily maximum amount allowed to be claimed in the expense report"""
+        config = Config.load_config()
+
+        if ARGS.set_max_claimable_amount:
+            config["max_claimable_amount"] = ARGS.set_max_claimable_amount
         else:
-            return config["storageDirectory"]["directory"]
+            config["max_claimable_amount"] = UserInput.prompt_for_max_claimable_amount()
+
+        Config.save_config(config)
 
 
 class ExpenseReport:
@@ -87,7 +124,7 @@ class ExpenseReport:
     def create_report():
         """Create a new expense report with headers"""
         storage_directory = Config.get_storage_directory()
-        file_name = f"{args.create_new_report}.json"
+        file_name = f"{ARGS.create_new_report}.json"
         path = f"{storage_directory}/{file_name}"
 
         headers = {
@@ -102,8 +139,21 @@ class ExpenseReport:
         with open(path, 'w') as expense_report:
             json.dump(headers, expense_report, indent=4)
 
+        print(
+            f"Created new report '{ARGS.create_new_report}' in '{storage_directory}' directory")
+
 
 class UserInput:
+
+    @staticmethod
+    def prompt_for_max_claimable_amount():
+        """Prompt the user for daily maximum amount allowed to be claimed in the expense report"""
+        while True:
+            max_claimable_amount = input(
+                "Enter the daily maximum amount allowed to be claimed in expense reports: ")
+            if UserInput.is_valid_monetary_value(max_claimable_amount):
+                return float(max_claimable_amount)
+            print("Enter a valid monetary value i.e. '10' or '10.01' NOT '10.1'")
 
     @staticmethod
     def is_valid_date(date_str):
@@ -120,7 +170,7 @@ class UserInput:
         return re.match(r'^\d+(\.\d{2})?$', value_str) is not None
 
     @staticmethod
-    def get_meal_cost(meal):
+    def prompt_for_meal_cost(meal):
         """
         Prompt the user to input the cost of a specified meal.
         The input is validated to ensure it is either an integer or a float with exactly 2 decimal places.
@@ -150,15 +200,16 @@ class UserInput:
             else:
                 print("Enter a valid date - DD/MM/YYYY")
 
-        breakfast_cost = UserInput.get_meal_cost("breakfast")
-        lunch_cost = UserInput.get_meal_cost("lunch")
-        dinner_cost = UserInput.get_meal_cost("dinner")
+        breakfast_cost = UserInput.prompt_for_meal_cost("breakfast")
+        lunch_cost = UserInput.prompt_for_meal_cost("lunch")
+        dinner_cost = UserInput.prompt_for_meal_cost("dinner")
 
-        total = breakfast_cost + lunch_cost + dinner_cost
+        # Use round to eliminate floating point error
+        total = round(breakfast_cost + lunch_cost + dinner_cost, 2)
 
-        # 30 is a place holder for now. TODO make claimable total a setting in config.json
-        if total > 30:
-            claimable_total = 30
+        max_claimable_total = Config.get_max_claimable_amount()
+        if total > max_claimable_total:
+            claimable_total = max_claimable_total
         else:
             claimable_total = total
 

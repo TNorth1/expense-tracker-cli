@@ -1,5 +1,4 @@
 {
-    "storageDirectory": {
-        "directory": "NOT_SET"
-    }
+    "report_storage_directory": "NOT_SET",
+    "max_claimable_amount": "NOT_SET"
 }

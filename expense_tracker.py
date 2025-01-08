@@ -5,8 +5,16 @@ from datetime import datetime
 import re
 
 
+def is_valid_arg_directory(directory_path):
+    """Validates input for '--set-storage-directory' option ensuring argument is a valid directory path"""
+    if not os.path.isdir(directory_path):
+        raise argparse.ArgumentTypeError(
+            f"{directory_path} is not a valid path for a directory")
+    return directory_path
+
+
 def is_valid_arg_amount(value):
-    """Validates input for '--set-max-claimable-amount' option ensuring it's a monetary value"""
+    """Validates input for '--set-max-claimable-amount' option ensuring argument a monetary value"""
     # if provided argument is not a valid monetary value, raise error
     if re.match(r'^\d+(\.\d{2})?$', value) is None:
         raise argparse.ArgumentTypeError(
@@ -17,7 +25,7 @@ def is_valid_arg_amount(value):
 def parse_arguments():
     """Parses command line arguments"""
     parser = argparse.ArgumentParser(description="Expense tracker")
-    parser.add_argument('-s', '--set-storage-directory', action='store_true',
+    parser.add_argument('-s', '--set-storage-directory', type=is_valid_arg_directory, required=False,
                         help="Set the directory to store expense reports in")
     parser.add_argument('-c', '--create-new-report', type=str, required=False,
                         help="Create a new expense report with the specified filename")
@@ -86,10 +94,8 @@ class Config:
         current_storage_directory = config["report_storage_directory"]
         # Update storage directory path with users input if conditions are met
         # TODO the conditional check is place holder, it will go in the main loop
-
         if (current_storage_directory == Config.DEFAULT_CONFIG_VALUE or
-                not os.path.isdir(current_storage_directory) or
-                ARGS.set_storage_directory):
+                not os.path.isdir(current_storage_directory)):
             config["report_storage_directory"] = Config.prompt_for_directory()
             Config.save_config(config)
 

@@ -50,7 +50,7 @@ class Config:
         """
         Loads the config.json file.
         Returns the config data if the file exists.
-        Returns None if the file does not exist.
+        Returns None if the file does not exist
         """
         try:
             with open(Config.CONFIG_PATH, "r") as config_file:
@@ -60,9 +60,23 @@ class Config:
 
     @staticmethod
     def save_config(config_data):
-        """Writes to and updates the config.json file with new config data."""
+        """Writes to and updates the config.json file with new config data"""
         with open(Config.CONFIG_PATH, "w") as config_file:
             json.dump(config_data, config_file, indent=4)
+
+    @staticmethod
+    def is_valid_config_keys():
+        """Checks if all of the keys in config.json are correct and untampered with.
+        returns True if valid
+        """
+        config_file = Config.load_config()
+        config_keys = ["report_storage_directory", "max_claimable_amount"]
+
+        for key in config_keys:
+            if key not in config_file:
+                return False
+
+        return True
 
     @staticmethod
     def set_default_config_settings():
@@ -74,7 +88,7 @@ class Config:
     def prompt_for_directory():
         """
         Prompt the user to input a valid directory path.
-        Returns the Directory if it is valid.
+        Returns the Directory if it is valid
         """
         while True:
             directory = input("Set the directory to store expense reports: ")
@@ -83,21 +97,17 @@ class Config:
             print("Directory does not exist, please try again or create the directory")
 
     @staticmethod
-    def set_storage_directory():
-        """Sets the storage directory if certain conditions are met."""
-        # Create config.json with default settings if it doesn't exist
-        config = Config.load_config()  # TODO this is place holder...
-        if config is None:  # ... this logic will go in the main loop
-            Config.set_default_config_settings()
-            config = Config.load_config()  # Load config again after resetting to default
+    def is_valid_config_directory():
+        """Returns true if the report_storage_directory setting is valid"""
+        config = Config.load_config()
+        return os.path.isdir(config["report_storage_directory"])
 
-        current_storage_directory = config["report_storage_directory"]
-        # Update storage directory path with users input if conditions are met
-        # TODO the conditional check is place holder, it will go in the main loop
-        if (current_storage_directory == Config.DEFAULT_CONFIG_VALUE or
-                not os.path.isdir(current_storage_directory)):
-            config["report_storage_directory"] = Config.prompt_for_directory()
-            Config.save_config(config)
+    @staticmethod
+    def set_storage_directory():
+        """Sets the storage directory in config.json"""
+        config = Config.load_config()
+        config["report_storage_directory"] = Config.prompt_for_directory()
+        Config.save_config(config)
 
     @staticmethod
     def get_storage_directory():

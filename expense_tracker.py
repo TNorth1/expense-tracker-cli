@@ -238,10 +238,6 @@ class UserInput:
         dinner_cost = UserInput.prompt_for_meal_cost("dinner")
         # Use round to eliminate floating point error
         total = round(breakfast_cost + lunch_cost + dinner_cost, 2)
-
-        if total > max_claimable_amount:
-            claimable_total = max_claimable_amount
-        else:
-            claimable_total = total
+        claimable_total = min(total, max_claimable_amount)
 
         return date, breakfast_cost, lunch_cost, dinner_cost, total, claimable_total

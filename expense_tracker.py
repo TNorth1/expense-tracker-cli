@@ -65,17 +65,15 @@ class Config:
             json.dump(config_data, config_file, indent=4)
 
     @staticmethod
-    def is_valid_config_keys():
+    def is_valid_config_keys(config):
         """Checks if all of the keys in config.json are correct and untampered with.
         returns True if valid
         """
-        config_file = Config.load_config()
         config_keys = ["report_storage_directory", "max_claimable_amount"]
 
         for key in config_keys:
-            if key not in config_file:
+            if key not in config:
                 return False
-
         return True
 
     @staticmethod
@@ -97,37 +95,32 @@ class Config:
             print("Directory does not exist, please try again or create the directory")
 
     @staticmethod
-    def is_valid_config_directory():
+    def is_valid_config_directory(config):
         """Returns true if the report_storage_directory setting is valid"""
-        config = Config.load_config()
         return os.path.isdir(config["report_storage_directory"])
 
     @staticmethod
-    def set_storage_directory():
+    def set_storage_directory(config):
         """Sets the storage directory in config.json"""
-        config = Config.load_config()
         config["report_storage_directory"] = Config.prompt_for_directory()
         Config.save_config(config)
 
     @staticmethod
-    def get_storage_directory():
+    def get_storage_directory(config):
         """Returns the storage directory path for expense reports"""
-        config = Config.load_config()
         return config["report_storage_directory"]
 
     @staticmethod
-    def get_max_claimable_amount():
+    def get_max_claimable_amount(config):
         """Returns the daily maximum amount allowed to be claimed in the expense report"""
-        config = Config.load_config()
         return config["max_claimable_amount"]
 
     @staticmethod
-    def set_max_claimable_amount():
+    def set_max_claimable_amount(config):
         """Set the daily maximum amount allowed to be claimed in the expense report"""
-        config = Config.load_config()
-
         if ARGS.set_max_claimable_amount:
             config["max_claimable_amount"] = ARGS.set_max_claimable_amount
+        # else if max_claimable_amount is an invalid value due to file tampering
         else:
             config["max_claimable_amount"] = UserInput.prompt_for_max_claimable_amount()
 
@@ -137,26 +130,43 @@ class Config:
 class ExpenseReport:
 
     @staticmethod
-    def create_report():
+    def create_report(storage_directory, file_name):
         """Create a new expense report with headers"""
-        storage_directory = Config.get_storage_directory()
-        file_name = f"{ARGS.create_new_report}.json"
+        file_name = f"{file_name}.json"
         path = f"{storage_directory}/{file_name}"
 
-        headers = {
-            "Date": [],
-            "Breakfast": [],
-            "Lunch": [],
-            "Dinner": [],
-            "Total": [],
-            "Claimable Total": []
+        # Create empty expense report
+        open(path, 'w').close()
+        print(
+            f"Created new report '{file_name}' in '{storage_directory}' directory")
+
+    @staticmethod
+    def load_expense_report(report_path):
+        """
+        Loads the expense report.
+        Returns the report if the file exists.
+        Returns None if the file does not exist
+        """
+        try:
+            with open(report_path, "r") as expense_report:
+                return json.load(expense_report)
+        except FileNotFoundError:
+            return None
+
+    @staticmethod
+    def init_new_report_row(report_data):
+        """Initialises a new report row"""
+
+        report_row = {
+            "Date": report_data[0],
+            "Breakfast": report_data[1],
+            "Lunch": report_data[2],
+            "Dinner": report_data[3],
+            "Total": report_data[4],
+            "Claimable Total": report_data[5]
         }
 
-        with open(path, 'w') as expense_report:
-            json.dump(headers, expense_report, indent=4)
-
-        print(
-            f"Created new report '{ARGS.create_new_report}' in '{storage_directory}' directory")
+        return report_row
 
 
 class UserInput:
@@ -202,30 +212,35 @@ class UserInput:
         return meal_cost
 
     @staticmethod
-    def get_report_data():
-        """Get the expense report data from user input"""
+    def get_date_for_report():
+        """
+        Prompts the user for the date of an expense entry and formats it to DD/MM/YYYY
+        """
         while True:
             date = input(
-                "Enter the date of the expense DD/MM/YYYY (Leave blank to select today's date): ")
-            if UserInput.is_valid_date(date):
-                break
+                "Enter the date of the expense DD/MM/YYYY (Leave blank to select today's date): ").strip()
             # If user input is left blank, use today's date
-            elif date.strip() == "":
+            if not date:
                 date = datetime.today().strftime('%d/%m/%Y')
                 break
-            else:
-                print("Enter a valid date - DD/MM/YYYY")
+            if UserInput.is_valid_date(date):
+                break
+            print("Enter a valid date - DD/MM/YYYY")
 
+        return date
+
+    @staticmethod
+    def get_report_data(max_claimable_amount):
+        """Get the expense report data from user input"""
+        date = UserInput.get_date_for_report()
         breakfast_cost = UserInput.prompt_for_meal_cost("breakfast")
         lunch_cost = UserInput.prompt_for_meal_cost("lunch")
         dinner_cost = UserInput.prompt_for_meal_cost("dinner")
-
         # Use round to eliminate floating point error
         total = round(breakfast_cost + lunch_cost + dinner_cost, 2)
 
-        max_claimable_total = Config.get_max_claimable_amount()
-        if total > max_claimable_total:
-            claimable_total = max_claimable_total
+        if total > max_claimable_amount:
+            claimable_total = max_claimable_amount
         else:
             claimable_total = total
 

@@ -12,6 +12,21 @@ def is_valid_arg_directory(directory_path):
             f"{directory_path} is not a valid path for a directory")
     return directory_path
 
+def is_valid_expense_report(filename):
+    """Validates input for expense report modification cli args, ensuring the specified expense report exists"""
+    # TODO get function to use the storage directory set in the config.json file
+    # if user enters the report name without the .json extension, append the extension
+    if not filename.endswith(".json"):
+        filename = filename + ".json"
+        
+    if not os.path.exists(filename):
+        filename_without_ext = filename.split(".")[0]
+        raise argparse.ArgumentTypeError(f"The Expense Report '{filename_without_ext}' does not exist")
+    elif filename == "config.json":
+        raise argparse.ArgumentTypeError("The config file is not an expense report")
+    
+    return filename
+
 
 def is_valid_arg_amount(value):
     """Validates input for '--set-max-claimable-amount' option ensuring argument a monetary value"""
@@ -29,6 +44,8 @@ def parse_arguments():
                         help="Set the directory to store expense reports in")
     parser.add_argument('-c', '--create-new-report', type=str, required=False,
                         help="Create a new expense report with the specified filename")
+    parser.add_argument('-n', '--add_new_report_row', type=is_valid_expense_report, required=False,
+                        help="Add a new row to a specified expense report")
     parser.add_argument('-m', '--set-max-claimable-amount', type=is_valid_arg_amount, required=False,
                         help="Set the daily maximum amount allowed to be claimed")
     return parser.parse_args()

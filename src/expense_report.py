@@ -1,4 +1,6 @@
 import json
+from rich.table import Table
+from rich.console import Console
 
 
 class ExpenseReport:
@@ -55,3 +57,32 @@ class ExpenseReport:
         report_file = ExpenseReport.load_expense_report(report_path)
         report_file.append(new_report_row)
         ExpenseReport.save_expense_report(report_file, report_path)
+
+    @staticmethod
+    def format_report_rows(report_data):
+        """Formats the report rows to be viewed correctly in the terminal. e.g. 9.0 -> £9"""
+        for row in report_data:
+            for key, value in row.items():
+                if isinstance(value, (int, float)):
+                    # if value float is a digit e.g. 10.0. value -> £10
+                    # else value float e.g. 10.01 -> £10.01
+                    row[key] = f"£{int(value) if value ==
+                                   int(value) else value}"
+
+        formatted_report_row = report_data
+        return formatted_report_row
+
+    @staticmethod
+    def view_report(report_name, formatted_report_data):
+        """Display the contents of the report in the terminal"""
+        table = Table(title=report_name,
+                      header_style="bold blue", border_style="bold green")
+
+        for column in formatted_report_data[0].keys():
+            table.add_column(column)
+
+        for item in formatted_report_data:
+            table.add_row(*[str(value) for value in item.values()])
+
+        console = Console()
+        console.print(table)

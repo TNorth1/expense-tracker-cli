@@ -59,8 +59,8 @@ class ExpenseReport:
         ExpenseReport.save_expense_report(report_file, report_path)
 
     @staticmethod
-    def calculate_grand_total_row(report_data):
-        """Calculates the grand total of expenses in a expense report"""
+    def calculate_grand_total(report_data):
+        """Calculates the grand total of expenses in an expense report"""
 
         grand_total = 0
         claimable_grand_total = 0
@@ -115,17 +115,20 @@ class ExpenseReport:
         return formatted_report_data
 
     @staticmethod
-    def populate_table(report_name, formatted_report_data):
-        # TODO add a create/init table method that splits this down
-        # Make this more reusable by making adding the total row
-        # a separate function
-        """Display the contents of the report in the terminal"""
+    def create_table(report_name):
+        """Creates table object and sets the tables name and colours"""
         table = Table(title=report_name,
                       header_style="bold magenta", border_style="bold green")
+        return table
 
+    @staticmethod
+    def populate_table(table, formatted_report_data):
+        """Populates the contents of the report in the into a table object"""
+        # Add columns to table
         for column in formatted_report_data[0].keys():
             table.add_column(column)
 
+        # Add all row to table except grand total row
         for item in formatted_report_data[:-1]:
             table.add_row(*[value for value in item.values()])
             # Add a line between each row
@@ -143,3 +146,23 @@ class ExpenseReport:
         "Prints the formatted table"
         console = Console()
         console.print(table)
+
+    @staticmethod
+    def display_report(report_path, report_name):
+        """A controller method that displays a specified report"""
+        report_data = ExpenseReport.load_expense_report(report_path)
+        if report_data is None:
+            raise FileNotFoundError("Error: Report does not exist")
+
+        grand_total_pair = ExpenseReport.calculate_grand_total(report_data)
+        grand_total_row = ExpenseReport.create_grand_total_row(
+            grand_total_pair)
+        report_data_with_totals = ExpenseReport.combine_data_with_grand_totals(
+            report_data, grand_total_row)
+
+        formatted_report_data = ExpenseReport.format_report_data(
+            report_data_with_totals)
+
+        table = ExpenseReport.create_table(report_name)
+        ExpenseReport.populate_table(table, formatted_report_data)
+        ExpenseReport.print_table(table)

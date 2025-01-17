@@ -1,9 +1,20 @@
 import json
 from rich.table import Table
 from rich.console import Console
+import os
 
 
 class ExpenseReport:
+
+    @staticmethod
+    def get_report_path(storage_directory, report_name):
+        """Creates a report path string from the storage directory and the report name"""
+        return os.path.join(storage_directory, report_name)
+    
+    @staticmethod
+    def add_json_ext(report_path):
+        """Adds the .json extension to the report_path"""
+        return f"{report_path}.json"
 
     @staticmethod
     def load_expense_report(report_path):
@@ -166,3 +177,23 @@ class ExpenseReport:
         table = ExpenseReport.create_table(report_name)
         ExpenseReport.populate_table(table, formatted_report_data)
         ExpenseReport.print_table(table)
+
+    @staticmethod
+    def list_reports(storage_directory):
+        """Lists the reports in a report storage directory"""
+        report_names = os.listdir(storage_directory)
+        # remove extensions from expense reports
+        formatted_report_names = [file.split(".")[0] for file in report_names]
+
+        print("\nExpense Reports:\n")
+        for report in formatted_report_names:
+            print(report)
+
+    @staticmethod
+    def delete_report(report_path, report_name):
+        """Delete a specified report"""
+        try:
+            os.remove(report_path)
+            print(f"Successfully removed {report_name}")
+        except FileNotFoundError:
+            print("Error: Report does not exist")

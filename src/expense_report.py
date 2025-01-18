@@ -10,7 +10,7 @@ class ExpenseReport:
     def get_report_path(storage_directory, report_name):
         """Creates a report path string from the storage directory and the report name"""
         return os.path.join(storage_directory, report_name)
-    
+
     @staticmethod
     def add_json_ext(report_path):
         """Adds the .json extension to the report_path"""

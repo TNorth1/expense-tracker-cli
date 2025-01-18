@@ -11,7 +11,6 @@ class Config:
     CONFIG_PATH = "config.json"
     DEFAULT_CONFIG_VALUE = "NOT_SET"
     DEFAULT_CONFIG_SETTINGS = {
-        "report_storage_directory": DEFAULT_CONFIG_VALUE,
         "max_claimable_amount": DEFAULT_CONFIG_VALUE
     }
 
@@ -39,12 +38,7 @@ class Config:
         """Checks if all of the keys in config.json are correct and untampered with.
         returns True if valid
         """
-        config_keys = ["report_storage_directory", "max_claimable_amount"]
-
-        for key in config_keys:
-            if key not in config:
-                return False
-        return True
+        return "max_claimable_amount" in config
 
     @staticmethod
     def set_default_config_settings():
@@ -54,6 +48,7 @@ class Config:
 
     @staticmethod
     def prompt_for_directory():
+        # Currently not used, may be implemented later
         """
         Prompt the user to input a valid directory path.
         Returns the Directory if it is valid
@@ -66,16 +61,19 @@ class Config:
 
     @staticmethod
     def is_valid_config_directory(config):
+        # Currently not used, may be implemented later
         """Returns true if the report_storage_directory setting is valid"""
         return os.path.isdir(config["report_storage_directory"])
 
     @staticmethod
     def set_storage_directory(config):
+        # Currently not used, may be implemented later
         """Sets the storage directory in config.json"""
         config["report_storage_directory"] = Config.prompt_for_directory()
         Config.save_config(config)
 
     @staticmethod
+    # Currently not used, may be implemented later
     def get_storage_directory(config):
         """Returns the storage directory path for expense reports"""
         return config["report_storage_directory"]

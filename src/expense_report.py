@@ -6,6 +6,14 @@ import os
 
 class ExpenseReport:
 
+    
+    @staticmethod
+    def get_storage_directory():
+        """Return the absolute path of the report storage directory"""
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        storage_directory = os.path.join(os.path.dirname(current_directory), 'reports')
+        return storage_directory
+
     @staticmethod
     def get_report_path(storage_directory, report_name):
         """Creates a report path string from the storage directory and the report name"""

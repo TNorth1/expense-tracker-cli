@@ -1,6 +1,7 @@
 import argparse
 import os
 import re
+from src.expense_report import ExpenseReport as er
 
 
 def is_valid_arg_directory(directory_path):
@@ -13,19 +14,18 @@ def is_valid_arg_directory(directory_path):
 
 
 def is_valid_expense_report(filename):
-    """Validates input for expense report modification cli args, ensuring the specified expense report exists"""
-    # TODO get function to use the storage directory set in the config.json file
+    """Validates input for expense report subcommand args, ensuring the specified expense report exists"""
     # if user enters the report name without the .json extension, append the extension
     if not filename.endswith(".json"):
         filename = filename + ".json"
 
-    if not os.path.exists(filename):
+    storage_directory = er.get_storage_directory()
+    file_path = os.path.join(storage_directory, filename)
+
+    if not os.path.exists(file_path):
         filename_without_ext = filename.split(".")[0]
         raise argparse.ArgumentTypeError(
             f"The Expense Report '{filename_without_ext}' does not exist")
-    elif filename == "config.json":
-        raise argparse.ArgumentTypeError(
-            "The config file is not an expense report")
 
     return filename
 
@@ -43,16 +43,30 @@ def is_valid_arg_amount(value):
 def parse_arguments():
     """Parses command line arguments"""
     parser = argparse.ArgumentParser(description="Expense tracker")
-    parser.add_argument('-s', '--set-storage-directory', type=is_valid_arg_directory, required=False,
-                        help="Set the directory to store expense reports in")
-    parser.add_argument('-c', '--create-new-report', type=str, required=False,
-                        help="Create a new expense report with the specified filename")
-    parser.add_argument('-n', '--add_new_report_row', type=is_valid_expense_report, required=False,
-                        help="Add a new row to a specified expense report")
-    parser.add_argument('-m', '--set-max-claimable-amount', type=is_valid_arg_amount, required=False,
-                        help="Set the daily maximum amount allowed to be claimed")
+    subparser = parser.add_subparsers(dest='command')
+
+    # Subcommand 'create'
+    create_parser = subparser.add_parser(
+        'create', help="Create a new expense report with the specified filename")
+    create_parser.add_argument(
+        'filename', type=str, help="The filename for the new expense report")
+
+    # Subcommand 'update'
+    update_parser = subparser.add_parser(
+        'update', help="Add a new row to a specified expense report")
+    update_parser.add_argument(
+        'filename', type=is_valid_expense_report, help="The filename to add expenses to")
+
+    # Subcommand 'display'
+    display_parser = subparser.add_parser(
+        'display', help="Display a specified expense report")
+    display_parser.add_argument(
+        'filename', type=is_valid_expense_report, help="The name of the report to be displayed")
+
+    # Subcommand 'set-max'
+    set_max_parser = subparser.add_parser(
+        'set-max', help="Set the daily maximum amount allowed to be claimed")
+    set_max_parser.add_argument('max_claimable_amount', type=is_valid_arg_amount,
+                                help="the daily maximum amount allowed to be claimed")
 
     return parser.parse_args()
-
-
-ARGS = parse_arguments()

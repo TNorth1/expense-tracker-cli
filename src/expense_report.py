@@ -2,16 +2,17 @@ import json
 from rich.table import Table
 from rich.console import Console
 import os
+from src.user_input import UserInput
 
 
 class ExpenseReport:
 
-    
     @staticmethod
     def get_storage_directory():
         """Return the absolute path of the report storage directory"""
         current_directory = os.path.dirname(os.path.abspath(__file__))
-        storage_directory = os.path.join(os.path.dirname(current_directory), 'reports')
+        storage_directory = os.path.join(
+            os.path.dirname(current_directory), 'reports')
         return storage_directory
 
     @staticmethod
@@ -76,6 +77,13 @@ class ExpenseReport:
         report_file = ExpenseReport.load_expense_report(report_path)
         report_file.append(new_report_row)
         ExpenseReport.save_expense_report(report_file, report_path)
+
+    @staticmethod
+    def add_new_report_row(max_claimable_amount, report_path):
+        """A controller method to add a new row to a specified report"""
+        new_report_data = UserInput.get_report_data(max_claimable_amount)
+        new_report_row = ExpenseReport.init_new_report_row(new_report_data)
+        ExpenseReport.append_row_to_report(new_report_row, report_path)
 
     @staticmethod
     def calculate_grand_total(report_data):

@@ -4,6 +4,22 @@ import re
 from src.expense_report import ExpenseReport as er
 
 
+def new_expense_report_name(filename):
+    """Vailidates and adds .json extension to filename if it is not present when creating a new report"""
+    if not filename.endswith(".json"):
+        filename = f"{filename}.json"
+
+    storage_directory = er.get_storage_directory()
+    file_path = os.path.join(storage_directory, filename)
+
+    if os.path.exists(file_path):
+        filename_without_ext = filename.split(".")[0]
+        raise argparse.ArgumentTypeError(
+            f"Report: '{filename_without_ext}' already exists")
+
+    return filename
+
+
 def is_valid_arg_directory(directory_path):
     """Validates input for '--set-storage-directory' option ensuring argument is a valid directory path"""
     if not os.path.isdir(directory_path):
@@ -49,7 +65,7 @@ def parse_arguments():
     create_parser = subparser.add_parser(
         'create', help="Create a new expense report with the specified filename")
     create_parser.add_argument(
-        'filename', type=str, help="The filename for the new expense report")
+        'filename', type=new_expense_report_name, help="The filename for the new expense report")
 
     # Subcommand 'update'
     update_parser = subparser.add_parser(
@@ -62,6 +78,15 @@ def parse_arguments():
         'display', help="Display a specified expense report")
     display_parser.add_argument(
         'filename', type=is_valid_expense_report, help="The name of the report to be displayed")
+
+    # Subcommand 'ls'
+    ls_parser = subparser.add_parser('ls', help="List all expense reports")
+
+    # Subcommand 'rm'
+    rm_parser = subparser.add_parser(
+        'rm', help="Remove a specified expense report")
+    rm_parser.add_argument(
+        'filename', type=is_valid_expense_report, help="The name of the report to be deleted")
 
     # Subcommand 'set-max'
     set_max_parser = subparser.add_parser(

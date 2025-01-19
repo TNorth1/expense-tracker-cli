@@ -46,6 +46,7 @@ class ExpenseReport:
 
     @staticmethod
     def create_new_report(storage_directory, file_name):
+        console = Console()
         """Create a new expense report with headers"""
         file_name_with_ext = f"{file_name}.json"
         path = f"{storage_directory}/{file_name_with_ext}"
@@ -53,8 +54,8 @@ class ExpenseReport:
 
         ExpenseReport.save_expense_report(empty_array, path)
 
-        print(
-            f"Created new report '{file_name}' in '{storage_directory}' directory")
+        console.print(
+            f"\n[bold #BD93F9]Created new report: [#50FA7B]{file_name}")
 
     @staticmethod
     def init_new_report_row(report_data):
@@ -144,8 +145,9 @@ class ExpenseReport:
     @staticmethod
     def create_table(report_name):
         """Creates table object and sets the tables name and colours"""
+        # #BD93F9 - Dracula Purple     #50FA7B - Dracula green
         table = Table(title=report_name,
-                      header_style="bold magenta", border_style="bold green")
+                      header_style="bold #BD93F9", border_style="#50FA7B")
         return table
 
     @staticmethod
@@ -197,19 +199,24 @@ class ExpenseReport:
     @staticmethod
     def list_reports(storage_directory):
         """Lists the reports in a report storage directory"""
+        # Uses the rich library to print colourful text
+        console = Console()
+
         report_names = os.listdir(storage_directory)
         # remove extensions from expense reports
         formatted_report_names = [file.split(".")[0] for file in report_names]
 
-        print("\nExpense Reports:\n")
+        console.print("\n[#50FA7B]Expense Reports:\n")
         for report in formatted_report_names:
-            print(report)
+            console.print(f"[bold #BD93F9]- {report}")
 
     @staticmethod
     def delete_report(report_path, report_name):
         """Delete a specified report"""
+        console = Console()
         try:
             os.remove(report_path)
-            print(f"Successfully removed {report_name}")
+            console.print(
+                f"\n[bold #BD93F9]Successfully removed report: [#50FA7B]{report_name}")
         except FileNotFoundError:
             print("Error: Report does not exist")

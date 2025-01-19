@@ -1,16 +1,12 @@
+import os
+from rich.console import Console
 from src import cli_args
 from src.config_manager import Config
 from src.expense_report import ExpenseReport
 from src.user_input import UserInput
-import os
 
 ARGS = cli_args.parse_arguments()
-
-STORAGE_DIRECTORY = ExpenseReport.get_storage_directory()
-# Create the reports directory if it doesn't exist
-os.makedirs(STORAGE_DIRECTORY, exist_ok=True)
-
-
+STORAGE_DIRECTORY = ExpenseReport.init_storage_directory()
 # Sets report's name, filename and path if a sub-command that interacts
 # with a file is used
 try:
@@ -21,26 +17,20 @@ try:
 except AttributeError:
     pass
 
-config = Config.load_config()
-# Create config file with default settings, if it doesn't exist, is empty
-# or the config keys have been tampered with and are not valid
-if config is None or not Config.is_valid_config_keys(config):
-    Config.set_default_config_settings()
-    config = Config.load_config()
-
-max_claimable_amount = config["max_claimable_amount"]
-if max_claimable_amount == Config.DEFAULT_CONFIG_VALUE:
-    max_claimable_amount = UserInput.prompt_for_max_claimable_amount()
-    Config.set_max_claimable_amount(config, max_claimable_amount)
+config = Config.init_config()
+max_claimable_amount = Config.init_max_claimable_amount(config)
+# to print colourful text
+console = Console()
 
 if ARGS.command == 'create':
-    ExpenseReport.create_new_report(STORAGE_DIRECTORY, REPORT_NAME)
-
-if ARGS.command == 'display':
-    ExpenseReport.display_report(REPORT_PATH, REPORT_NAME)
-
-if ARGS.command == 'update':
+    ExpenseReport.create_new_report(STORAGE_DIRECTORY, REPORT_NAME, console)
+elif ARGS.command == 'display':
+    ExpenseReport.display_report(REPORT_PATH, REPORT_NAME, console)
+elif ARGS.command == 'update':
     ExpenseReport.add_new_report_row(max_claimable_amount, REPORT_PATH)
-
-if ARGS.command == 'set-max':
+elif ARGS.command == 'ls':
+    ExpenseReport.list_reports(STORAGE_DIRECTORY, console)
+elif ARGS.command == 'rm':
+    ExpenseReport.delete_report(REPORT_PATH, REPORT_NAME, console)
+elif ARGS.command == 'set-max':
     Config.set_max_claimable_amount(config, ARGS.max_claimable_amount)

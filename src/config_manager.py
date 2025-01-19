@@ -1,6 +1,6 @@
 import json
 import os
-
+from src.user_input import UserInput
 
 class Config:
     DEFAULT_CONFIG_VALUE = "NOT_SET"
@@ -49,6 +49,15 @@ class Config:
         Config.save_config(config)
 
     @staticmethod
+    def init_config():
+        """Initialise configuration settings for use in main"""
+        config = Config.load_config()
+        if config is None or not Config.is_valid_config_keys(config):
+            Config.set_default_config_settings()
+            config = Config.load_config()
+        return config
+
+    @staticmethod
     def get_max_claimable_amount(config):
         """Returns the daily maximum amount allowed to be claimed in the expense report"""
         return config["max_claimable_amount"]
@@ -59,6 +68,19 @@ class Config:
         config["max_claimable_amount"] = args_value
         Config.save_config(config)
 
+    @staticmethod
+    def init_max_claimable_amount(config):
+        """
+        Initialises the daily maximum amount allowed to be claimed in an
+        expense report for main
+        """
+        max_claimable_amount = config["max_claimable_amount"]
+        if max_claimable_amount == Config.DEFAULT_CONFIG_VALUE:
+            max_claimable_amount = UserInput.prompt_for_max_claimable_amount()
+            Config.set_max_claimable_amount(config, max_claimable_amount)
+        return max_claimable_amount
+    
+    
     # Currently not used, may be implemented later
     # @staticmethod
     # def prompt_for_directory():

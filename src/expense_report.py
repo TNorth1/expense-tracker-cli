@@ -1,6 +1,5 @@
 import json
 from rich.table import Table
-from rich.console import Console
 import os
 from src.user_input import UserInput
 
@@ -16,14 +15,11 @@ class ExpenseReport:
         return storage_directory
 
     @staticmethod
-    def get_report_path(storage_directory, report_name):
-        """Creates a report path string from the storage directory and the report name"""
-        return os.path.join(storage_directory, report_name)
-
-    @staticmethod
-    def add_json_ext(report_path):
-        """Adds the .json extension to the report_path"""
-        return f"{report_path}.json"
+    def init_storage_directory():
+        """Initialise the storage directory for main"""
+        storage_directory = ExpenseReport.get_storage_directory()
+        os.makedirs(storage_directory, exist_ok=True)
+        return storage_directory
 
     @staticmethod
     def load_expense_report(report_path):
@@ -45,8 +41,7 @@ class ExpenseReport:
             json.dump(report_data, report_file, indent=4)
 
     @staticmethod
-    def create_new_report(storage_directory, file_name):
-        console = Console()
+    def create_new_report(storage_directory, file_name, console):
         """Create a new expense report with headers"""
         file_name_with_ext = f"{file_name}.json"
         path = f"{storage_directory}/{file_name_with_ext}"
@@ -171,13 +166,12 @@ class ExpenseReport:
         return table
 
     @staticmethod
-    def print_table(table):
+    def print_table(table, console):
         "Prints the formatted table"
-        console = Console()
         console.print(table)
 
     @staticmethod
-    def display_report(report_path, report_name):
+    def display_report(report_path, report_name, console):
         """A controller method that displays a specified report"""
         report_data = ExpenseReport.load_expense_report(report_path)
         if report_data is None:
@@ -194,14 +188,11 @@ class ExpenseReport:
 
         table = ExpenseReport.create_table(report_name)
         ExpenseReport.populate_table(table, formatted_report_data)
-        ExpenseReport.print_table(table)
+        ExpenseReport.print_table(table, console)
 
     @staticmethod
-    def list_reports(storage_directory):
+    def list_reports(storage_directory, console):
         """Lists the reports in a report storage directory"""
-        # Uses the rich library to print colourful text
-        console = Console()
-
         report_names = os.listdir(storage_directory)
         # remove extensions from expense reports
         formatted_report_names = [file.split(".")[0] for file in report_names]
@@ -211,9 +202,8 @@ class ExpenseReport:
             console.print(f"[bold #BD93F9]- {report}")
 
     @staticmethod
-    def delete_report(report_path, report_name):
+    def delete_report(report_path, report_name, console):
         """Delete a specified report"""
-        console = Console()
         try:
             os.remove(report_path)
             console.print(

@@ -74,3 +74,14 @@ class UserInput:
         claimable_total = min(total, max_claimable_amount)
 
         return date, breakfast_cost, lunch_cost, dinner_cost, total, claimable_total
+
+    @staticmethod
+    def add_another_row():
+        while True:
+            add_another_row = input("Do you want to add another row? y/n: ")
+            if add_another_row.lower() in ["y", "n"]:
+                break
+            else:
+                print("Please enter 'y' or 'n'")
+
+        return add_another_row == 'y'

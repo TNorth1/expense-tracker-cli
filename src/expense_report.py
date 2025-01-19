@@ -77,9 +77,12 @@ class ExpenseReport:
     @staticmethod
     def add_new_report_row(max_claimable_amount, report_path):
         """A controller method to add a new row to a specified report"""
-        new_report_data = UserInput.get_report_data(max_claimable_amount)
-        new_report_row = ExpenseReport.init_new_report_row(new_report_data)
-        ExpenseReport.append_row_to_report(new_report_row, report_path)
+        add_another_row = True
+        while add_another_row:
+            new_report_data = UserInput.get_report_data(max_claimable_amount)
+            new_report_row = ExpenseReport.init_new_report_row(new_report_data)
+            ExpenseReport.append_row_to_report(new_report_row, report_path)
+            add_another_row = UserInput.add_another_row()
 
     @staticmethod
     def calculate_grand_total(report_data):

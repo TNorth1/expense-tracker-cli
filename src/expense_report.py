@@ -55,16 +55,11 @@ class ExpenseReport:
     @staticmethod
     def init_new_report_row(report_data):
         """Initialises a new report row"""
-
         report_row = {
             "Date": report_data[0],
-            "Breakfast": report_data[1],
-            "Lunch": report_data[2],
-            "Dinner": report_data[3],
-            "Total": report_data[4],
-            "Claimable Total": report_data[5]
+            "Amount": report_data[1],
+            "Description": report_data[2],
         }
-
         return report_row
 
     @staticmethod
@@ -75,60 +70,47 @@ class ExpenseReport:
         ExpenseReport.save_expense_report(report_file, report_path)
 
     @staticmethod
-    def add_new_report_row(max_claimable_amount, report_path):
+    def add_new_report_row(report_path):
         """A controller method to add a new row to a specified report"""
         add_another_row = True
         while add_another_row:
-            new_report_data = UserInput.get_report_data(max_claimable_amount)
+            new_report_data = UserInput.get_report_data()
             new_report_row = ExpenseReport.init_new_report_row(new_report_data)
             ExpenseReport.append_row_to_report(new_report_row, report_path)
-            add_another_row = UserInput.add_another_row()
+            add_another_row = UserInput.ask_to_add_another_row()
 
     @staticmethod
-    def calculate_grand_total(report_data):
-        """Calculates the grand total of expenses in an expense report"""
-
-        grand_total = 0
-        claimable_grand_total = 0
-
+    def calculate_total(report_data):
+        """Calculates the total cost of expenses in an expense report"""
+        expense_total = 0
         for row in report_data:
-            grand_total += row["Total"]
-            claimable_grand_total += row["Claimable Total"]
-
-        return grand_total, claimable_grand_total
+            expense_total += row["Amount"]
+        # Return to the nearest 2 decimal places to avoid rounding error
+        return round(expense_total, 2)
 
     @staticmethod
-    def create_grand_total_row(grand_total_pair):
-        """Create a row for the grand total and the claimable grand total"""
-        # unpack the grand_total_pair tuple
-        grand_total, claimable_grand_total = grand_total_pair
-
-        # the Grand Total replaces the Total
-        # The Claimable Grand Total replaces the Claimable Total
-        grand_total_row = {
+    def create_total_row(expense_total):
+        """Create a row for the expense total"""
+        expense_total_row = {
             "Date": "",
-            "Breakfast": "",
-            "Lunch": "",
-            "Dinner": "",
-            "Total": grand_total,
-            "Claimable Total": claimable_grand_total
+            "Amount": expense_total,
+            "Description": ""
         }
-
-        return grand_total_row
+        return expense_total_row
 
     @staticmethod
-    def combine_data_with_grand_totals(report_data, grand_total_row):
+    def combine_data_with_total(report_data, expense_total_row):
         """
-        Combines report data with a grand totals row. Does not alter the report file,
+        Combines report data with totals row. Does not alter the report file,
         it is just for the purposes of displaying the report table
         """
-        # Convert grand_total_row to a list, to allow concatenation with report data list
-        return report_data + [grand_total_row]
+        # Convert expense_totals_row to a list, to allow concatenation with report data list
+        return report_data + [expense_total_row]
 
     @staticmethod
-    def format_report_data(report_data_with_totals):
+    def format_report_data(report_data_with_total):
         """Formats the report rows to be viewed correctly in the terminal. e.g. 9.0 -> £9"""
-        for row in report_data_with_totals:
+        for row in report_data_with_total:
             for key, value in row.items():
                 if isinstance(value, (int, float)):
                     # if value float is a digit e.g. 10.0 value -> £10
@@ -136,27 +118,35 @@ class ExpenseReport:
                     row[key] = f"£{int(value) if value ==
                                    int(value) else value}"
 
-        formatted_report_data = report_data_with_totals
-
+        formatted_report_data = report_data_with_total
         return formatted_report_data
 
     @staticmethod
+    def format_total_row(formatted_report_data):
+        """Formats the totals row, adding a prefix to explain it is the total"""
+        expense_total = formatted_report_data[-1]["Amount"]
+        formatted_report_data[-1]["Amount"] = f"Total = {expense_total}"
+
+        formatted_data_with_total = formatted_report_data
+        return formatted_data_with_total
+
+    @staticmethod
     def create_table(report_name):
-        """Creates table object and sets the tables name and colours"""
+        """Creates table object and sets the tables title and colours"""
         # #BD93F9 - Dracula Purple     #50FA7B - Dracula green
-        table = Table(title=report_name,
+        table = Table(title=f"Expense Report: {report_name}",
                       header_style="bold #BD93F9", border_style="#50FA7B")
         return table
 
     @staticmethod
-    def populate_table(table, formatted_report_data):
-        """Populates the contents of the report in the into a table object"""
+    def populate_table(table, formatted_data_with_total):
+        """Populates the contents of the report into a table object"""
         # Add columns to table
-        for column in formatted_report_data[0].keys():
+        for column in formatted_data_with_total[0].keys():
             table.add_column(column)
 
         # Add all row to table except grand total row
-        for item in formatted_report_data[:-1]:
+        for item in formatted_data_with_total[:-1]:
             table.add_row(*[value for value in item.values()])
             # Add a line between each row
             table.add_section()
@@ -164,7 +154,7 @@ class ExpenseReport:
         # Add extra line after report rows
         table.add_section()
         # Add the grand total row to the table
-        table.add_row(*[value for value in formatted_report_data[-1].values()])
+        table.add_row(*[value for value in formatted_data_with_total[-1].values()])
 
         return table
 
@@ -180,17 +170,19 @@ class ExpenseReport:
         if report_data is None:
             raise FileNotFoundError("Error: Report does not exist")
 
-        grand_total_pair = ExpenseReport.calculate_grand_total(report_data)
-        grand_total_row = ExpenseReport.create_grand_total_row(
-            grand_total_pair)
-        report_data_with_totals = ExpenseReport.combine_data_with_grand_totals(
-            report_data, grand_total_row)
+        expense_total = ExpenseReport.calculate_total(report_data)
+        total_row = ExpenseReport.create_total_row(
+            expense_total)
+        data_with_totals = ExpenseReport.combine_data_with_total(
+            report_data, total_row)
 
-        formatted_report_data = ExpenseReport.format_report_data(
-            report_data_with_totals)
+        formatted_data = ExpenseReport.format_report_data(
+            data_with_totals)
+        formatted_data_with_total = ExpenseReport.format_total_row(formatted_data)
 
         table = ExpenseReport.create_table(report_name)
-        ExpenseReport.populate_table(table, formatted_report_data)
+        ExpenseReport.populate_table(table, formatted_data_with_total)
+        print()
         ExpenseReport.print_table(table, console)
 
     @staticmethod

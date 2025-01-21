@@ -5,7 +5,7 @@ from src.expense_report import ExpenseReport as er
 
 
 def new_expense_report_name(filename):
-    """Vailidates and adds .json extension to filename if it is not present when creating a new report"""
+    """Validates and adds .json extension to filename if it is not present when creating a new report"""
     if not filename.endswith(".json"):
         filename = f"{filename}.json"
 
@@ -80,7 +80,7 @@ def parse_arguments():
         'filename', type=is_valid_expense_report, help="The name of the report to be displayed")
 
     # Subcommand 'ls'
-    ls_parser = subparser.add_parser('ls', help="List all expense reports")
+    subparser.add_parser('ls', help="List all expense reports")
 
     # Subcommand 'rm'
     rm_parser = subparser.add_parser(

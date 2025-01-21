@@ -29,26 +29,21 @@ class UserInput:
         return re.match(r'^\d+(\.\d{2})?$', value_str) is not None
 
     @staticmethod
-    def prompt_for_meal_cost(meal):
-        """
-        Prompt the user to input the cost of a specified meal.
-        The input is validated to ensure it is either an integer or a float with exactly 2 decimal places.
-        """
+    def prompt_for_expense_cost():
+        """Prompt the user to input the cost of a specified meal and validates input"""
         while True:
-            meal_cost = input(f"Enter the cost of {meal}: ")
-            if UserInput.is_valid_monetary_value(meal_cost):
-                meal_cost = float(meal_cost)
+            expense_cost = input("Enter the cost of the expense: ")
+            if UserInput.is_valid_monetary_value(expense_cost):
+                expense_cost = float(expense_cost)
                 break
             else:
                 print("Enter a valid monetary value i.e. '10' or '10.01' NOT '10.1'")
 
-        return meal_cost
+        return expense_cost
 
     @staticmethod
     def get_date_for_report():
-        """
-        Prompts the user for the date of an expense entry and formats it to DD/MM/YYYY
-        """
+        """Prompts the user for the date of an expense entry and formats it to Day DD/MM/YYYY."""
         while True:
             date = input(
                 "Enter the date of the expense DD/MM/YYYY (Leave blank to select today's date): ").strip()
@@ -60,28 +55,37 @@ class UserInput:
                 break
             print("Enter a valid date - DD/MM/YYYY")
 
-        return date
+        date_obj = datetime.strptime(date, '%d/%m/%Y')
+        formatted_date = date_obj.strftime('%a %d/%m/%Y')
+        
+        return formatted_date
 
     @staticmethod
-    def get_report_data(max_claimable_amount):
+    def get_expense_description():
+        """Prompts the user for a description of an expense entry, ensuring it is not left blank"""
+        while True:
+            description = input("Enter a description: ")
+            if not description.strip() == "":
+                break
+            print("Please enter a description")
+            
+        return description
+            
+    @staticmethod
+    def get_report_data():
         """Get the expense report data from user input"""
         date = UserInput.get_date_for_report()
-        breakfast_cost = UserInput.prompt_for_meal_cost("breakfast")
-        lunch_cost = UserInput.prompt_for_meal_cost("lunch")
-        dinner_cost = UserInput.prompt_for_meal_cost("dinner")
-        # Use round to eliminate floating point error
-        total = round(breakfast_cost + lunch_cost + dinner_cost, 2)
-        claimable_total = min(total, max_claimable_amount)
-
-        return date, breakfast_cost, lunch_cost, dinner_cost, total, claimable_total
+        expense_cost = UserInput.prompt_for_expense_cost()
+        description = UserInput.get_expense_description()
+        return date, expense_cost, description
 
     @staticmethod
-    def add_another_row():
+    def ask_to_add_another_row():
+        """Prompts the user to ask if they want to add another row to a report"""
         while True:
             add_another_row = input("Do you want to add another row? y/n: ")
             if add_another_row.lower() in ["y", "n"]:
                 break
-            else:
-                print("Please enter 'y' or 'n'")
+            print("Please enter 'y' or 'n'")
 
         return add_another_row == 'y'

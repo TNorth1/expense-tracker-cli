@@ -16,9 +16,9 @@ class UserInput:
 
     @staticmethod
     def is_valid_date(date_str):
-        """Validate user input for date in the format dd/mm/yyyy"""
+        """Validate user input for date in the format yyyy-mm-dd"""
         try:
-            datetime.strptime(date_str, "%d/%m/%Y")
+            datetime.strptime(date_str, '%Y-%m-%d')
             return True
         except ValueError:
             return False
@@ -38,7 +38,6 @@ class UserInput:
                 break
             else:
                 print("Enter a valid monetary value i.e. '10' or '10.01' NOT '10.1'")
-
         return expense_cost
 
     @staticmethod
@@ -46,19 +45,15 @@ class UserInput:
         """Prompts the user for the date of an expense entry and formats it to Day DD/MM/YYYY."""
         while True:
             date = input(
-                "Enter the date of the expense DD/MM/YYYY (Leave blank to select today's date): ").strip()
+                "Enter the date of the expense YYYY-MM-DD (Leave blank to select today's date): ").strip()
             # If user input is left blank, use today's date
             if not date:
-                date = datetime.today().strftime('%d/%m/%Y')
+                date = datetime.today().strftime('%Y-%m-%d')
                 break
             if UserInput.is_valid_date(date):
                 break
-            print("Enter a valid date - DD/MM/YYYY")
-
-        date_obj = datetime.strptime(date, '%d/%m/%Y')
-        formatted_date = date_obj.strftime('%a %d/%m/%Y')
-        
-        return formatted_date
+            print("Enter a valid date - YYYY-MM-DD")
+        return date
 
     @staticmethod
     def get_expense_description():
@@ -68,9 +63,8 @@ class UserInput:
             if not description.strip() == "":
                 break
             print("Please enter a description")
-            
         return description
-            
+
     @staticmethod
     def get_report_data():
         """Get the expense report data from user input"""
@@ -87,5 +81,4 @@ class UserInput:
             if add_another_row.lower() in ["y", "n"]:
                 break
             print("Please enter 'y' or 'n'")
-
         return add_another_row == 'y'

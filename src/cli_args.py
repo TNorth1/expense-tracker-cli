@@ -78,6 +78,8 @@ def parse_arguments():
         'display', help="Display a specified expense report")
     display_parser.add_argument(
         'filename', type=is_valid_expense_report, help="The name of the report to be displayed")
+    display_parser.add_argument('--summary', '-s', action='store_true',
+                                help="Display the summarised report, grouped by date")
 
     # Subcommand 'ls'
     subparser.add_parser('ls', help="List all expense reports")

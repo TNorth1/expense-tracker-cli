@@ -27,7 +27,11 @@ def main():
         ExpenseReport.create_new_report(
             STORAGE_DIRECTORY, REPORT_NAME, console)
     elif ARGS.command == 'display':
-        ExpenseReport.display_report(REPORT_PATH, REPORT_NAME, console)
+        if ARGS.summary:
+            ExpenseReport.display_summary(
+                REPORT_PATH, REPORT_NAME, max_claimable_amount, console)
+        else:
+            ExpenseReport.display_report(REPORT_PATH, REPORT_NAME, console)
     elif ARGS.command == 'update':
         ExpenseReport.add_new_report_row(REPORT_PATH)
     elif ARGS.command == 'ls':

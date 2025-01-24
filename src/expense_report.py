@@ -244,9 +244,9 @@ class ExpenseReport:
         table.add_row(*['', grand_total, claimable_total])
         return table
 
-    @ staticmethod
-    def display_report(report_path, report_name, console):
-        """A controller method that displays a specified report"""
+    @staticmethod
+    def json_to_formatted_report_df(report_path):
+        """A Controller method to parse JSON report data to a formatted report df"""
         report_data = ExpenseReport.load_expense_report(report_path)
         if report_data is None:
             raise FileNotFoundError("Error: Report does not exist")
@@ -256,20 +256,14 @@ class ExpenseReport:
         df_plus_total = ExpenseReport.df_add_total_row(df_sorted)
 
         formatted_df = ExpenseReport.format_report_data(df_plus_total)
-        final_df = ExpenseReport.format_grand_total_cell(
+        formatted_df = ExpenseReport.format_grand_total_cell(
             formatted_df, "Amount", "Total")
 
-        table = ExpenseReport.create_table("Expense Report", report_name)
-        populated_table = ExpenseReport.populate_report_table(table, final_df)
-        populated_table_with_total = ExpenseReport.populate_report_table_with_total(
-            populated_table, final_df)
-
-        print()
-        console.print(populated_table_with_total)
+        return formatted_df
 
     @staticmethod
-    def display_summary(report_path, report_name, max_claimable_amount, console):
-        """A controller method that displays the summarised expense report, grouped by date"""
+    def json_to_formatted_summary_df(report_path, max_claimable_amount):
+        """A Controller method to parse JSON report data to a formatted report summary df"""
         report_data = ExpenseReport.load_expense_report(report_path)
         if report_data is None:
             raise FileNotFoundError("Error: Report does not exist")
@@ -285,14 +279,34 @@ class ExpenseReport:
         formatted_df1 = ExpenseReport.format_summary_data(df_plus_tot_row)
         formatted_df2 = ExpenseReport.format_grand_total_cell(
             formatted_df1, "Total", "Total")
-        formatted_df3 = ExpenseReport.format_grand_total_cell(
+        final_formatted_df = ExpenseReport.format_grand_total_cell(
             formatted_df2, "Claimable Total", "Total")
 
-        table1 = ExpenseReport.create_table("Summary Report", report_name)
-        table2 = ExpenseReport.populate_summary_table(table1, formatted_df3)
-        table3 = ExpenseReport.populate_summary_table_with_totals(
-            table2, formatted_df3)
+        return final_formatted_df
 
+    @ staticmethod
+    def display_report(report_path, report_name, console):
+        """A controller method that displays a specified report"""
+        formatted_df = ExpenseReport.json_to_formatted_report_df(report_path)
+
+        table = ExpenseReport.create_table("Expense Report", report_name)
+        populated_table = ExpenseReport.populate_report_table(
+            table, formatted_df)
+        populated_table_with_total = ExpenseReport.populate_report_table_with_total(
+            populated_table, formatted_df)
+        print()
+        console.print(populated_table_with_total)
+
+    @staticmethod
+    def display_summary(report_path, report_name, max_claimable_amount, console):
+        """A controller method that displays the summarised expense report, grouped by date"""
+        formatted_report_df = ExpenseReport.json_to_formatted_summary_df(report_path, max_claimable_amount)
+
+        table1 = ExpenseReport.create_table("Summary Report", report_name)
+        table2 = ExpenseReport.populate_summary_table(
+            table1, formatted_report_df)
+        table3 = ExpenseReport.populate_summary_table_with_totals(
+            table2, formatted_report_df)
         print()
         console.print(table3)
 

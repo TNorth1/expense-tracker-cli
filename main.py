@@ -40,6 +40,9 @@ def main():
         ExpenseReport.delete_report(REPORT_PATH, REPORT_NAME, console)
     elif ARGS.command == 'set-max':
         Config.set_max_claimable_amount(config, ARGS.max_claimable_amount)
+    elif ARGS.command == 'export':
+        ExpenseReport.handle_export_command(
+            REPORT_NAME, REPORT_PATH, max_claimable_amount, console)
 
 
 if __name__ == "__main__":

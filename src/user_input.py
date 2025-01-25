@@ -1,5 +1,7 @@
 from datetime import datetime
 import re
+from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox
+from PyQt5.QtCore import QStandardPaths
 
 
 class UserInput:
@@ -82,3 +84,30 @@ class UserInput:
                 break
             print("Please enter 'y' or 'n'")
         return add_another_row == 'y'
+
+    @staticmethod
+    def prompt_export_dir():
+        """Prompt the user for the directory to export expense report to"""
+        # Open file explorer gui in downloads folder (platform agnostic)
+        default_download_path = QStandardPaths.writableLocation(
+            QStandardPaths.DownloadLocation)
+        app = QApplication([])  # Create the application object
+        directory = QFileDialog.getExistingDirectory(
+            None, "Select a Directory", default_download_path)
+
+        if directory:
+            return directory
+        # If no folder is selected
+        return None
+
+    @staticmethod
+    def prompt_to_overwrite(exported_file_path):
+        """Prompt the user to ask if they want to over write a file that already exists"""
+        app = QApplication([])
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Warning)
+        msg_box.setWindowTitle("File Exists")
+        msg_box.setText(f"{exported_file_path} already exists. Overwrite?")
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        reply = msg_box.exec_()
+        return reply == QMessageBox.Yes

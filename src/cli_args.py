@@ -96,4 +96,10 @@ def parse_arguments():
     set_max_parser.add_argument('max_claimable_amount', type=is_valid_arg_amount,
                                 help="the daily maximum amount allowed to be claimed")
 
+    # Subcommand 'export'
+    export_parser = subparser.add_parser(
+        'export', help="Export a specified expense report to an excel spreadsheet")
+    export_parser.add_argument(
+        "filename", type=is_valid_expense_report, help="The name of the report to be exported")
+
     return parser.parse_args()

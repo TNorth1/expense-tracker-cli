@@ -1,8 +1,9 @@
+import os
+import sys
 import json
 from rich.table import Table
-import os
-from src.user_input import UserInput
 import pandas as pd
+from src.user_input import UserInput
 
 
 class ExpenseReport:
@@ -300,7 +301,8 @@ class ExpenseReport:
     @staticmethod
     def display_summary(report_path, report_name, max_claimable_amount, console):
         """A controller method that displays the summarised expense report, grouped by date"""
-        formatted_report_df = ExpenseReport.json_to_formatted_summary_df(report_path, max_claimable_amount)
+        formatted_report_df = ExpenseReport.json_to_formatted_summary_df(
+            report_path, max_claimable_amount)
 
         table1 = ExpenseReport.create_table("Summary Report", report_name)
         table2 = ExpenseReport.populate_summary_table(
@@ -330,3 +332,41 @@ class ExpenseReport:
                 f"\n[bold #BD93F9]Successfully removed report: [#50FA7B]{report_name}")
         except FileNotFoundError:
             print("Error: Report does not exist")
+
+    @staticmethod
+    def export_report_and_summary(report_df, summary_df, export_path):
+        """
+        Export the expense report and the summary report into an excel spreadsheet,
+        separated by 2 tabs
+        """
+        with pd.ExcelWriter(export_path, engine='xlsxwriter') as writer:
+            report_df.to_excel(
+                writer, sheet_name='Expense Report', index=False)
+            summary_df.to_excel(
+                writer, sheet_name='Summary Report', index=False)
+            workbook = writer.book
+
+    @staticmethod
+    def handle_export_command(report_name, report_path, max_claimable_amount, console):
+        """A handler method to control the logic for exporting the expense report and summary"""
+        report_df = ExpenseReport.json_to_formatted_report_df(report_path)
+        summary_df = ExpenseReport.json_to_formatted_summary_df(
+            report_path, max_claimable_amount)
+
+        export_dir = UserInput.prompt_export_dir()
+        if export_dir is None:
+            console.print("[bold #FF5555]No Directory selected")
+            sys.exit(1)
+
+        output_file = f"{report_name}.xlsx"
+        path = os.path.join(export_dir, output_file)
+
+        if os.path.exists(path):
+            overwrite = UserInput.prompt_to_overwrite(path)
+            if not overwrite:
+                sys.exit(1)
+
+        ExpenseReport.export_report_and_summary(
+            report_df, summary_df, path)
+        console.print(f"[bold #50FA7B]Exported Expense Report '{
+                      report_name}' to {export_dir}")

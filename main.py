@@ -37,7 +37,10 @@ def main():
     elif ARGS.command == 'ls':
         ExpenseReport.list_reports(STORAGE_DIRECTORY, console)
     elif ARGS.command == 'rm':
-        ExpenseReport.delete_report(REPORT_PATH, REPORT_NAME, console)
+        if ARGS.id:
+            ExpenseReport.handle_rm_row(ARGS.id, REPORT_PATH, console)
+        else:
+            ExpenseReport.delete_report(REPORT_PATH, REPORT_NAME, console)
     elif ARGS.command == 'set-max':
         Config.set_max_claimable_amount(config, ARGS.max_claimable_amount)
     elif ARGS.command == 'export':

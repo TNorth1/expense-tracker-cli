@@ -89,6 +89,7 @@ def parse_arguments():
         'rm', help="Remove a specified expense report")
     rm_parser.add_argument(
         'filename', type=is_valid_expense_report, help="The name of the report to be deleted")
+    rm_parser.add_argument("--id", "-i", type=int, help="Specify a Report ID to be deleted.")
 
     # Subcommand 'set-max'
     set_max_parser = subparser.add_parser(

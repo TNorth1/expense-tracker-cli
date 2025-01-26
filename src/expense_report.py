@@ -56,7 +56,7 @@ class ExpenseReport:
         ExpenseReport.save_expense_report(df_columns, path)
 
         console.print(
-            f"\n[bold #BD93F9]Created new report: [#50FA7B]{file_name}")
+            f"\n[bold #50FA7B]Created new report: '{file_name}'")
 
     @staticmethod
     def init_new_report_row(report_data):
@@ -203,7 +203,7 @@ class ExpenseReport:
         # Add all rows to table except total row
         for index, row in formatted_report_df[:-1].iterrows():
             table.add_row(*[str(index + 1), row['Date'],
-                          row['Amount'], row['Description']])
+                          row['Amount'], row['Description']], style="bold #F859A8")
             # Add a line between each row
             table.add_section()
         return table
@@ -214,7 +214,7 @@ class ExpenseReport:
         # Add extra line after report data rows
         table.add_section()
         total_amount = formatted_report_df['Amount'].iloc[-1]
-        table.add_row(*['', '', total_amount])
+        table.add_row(*['', '', total_amount], style="bold yellow")
         return table
 
     @staticmethod
@@ -230,7 +230,7 @@ class ExpenseReport:
         ), df["Claimable Total"].tolist()]
         for i in range(len(df) - 1):
             table.add_row(
-                *[str(lst_data[0][i]), lst_data[1][i], lst_data[2][i]])
+                *[str(lst_data[0][i]), lst_data[1][i], lst_data[2][i]], style='bold #F859A8')
             # Add a line between each row
             table.add_section()
         return table
@@ -242,7 +242,7 @@ class ExpenseReport:
         table.add_section()
         grand_total = formatted_report_df['Total'].iloc[-1]
         claimable_total = formatted_report_df['Claimable Total'].iloc[-1]
-        table.add_row(*['', grand_total, claimable_total])
+        table.add_row(*['', grand_total, claimable_total], style="bold yellow")
         return table
 
     @staticmethod
@@ -321,7 +321,7 @@ class ExpenseReport:
 
         console.print("\n[#50FA7B]Expense Reports:\n")
         for report in formatted_report_names:
-            console.print(f"[bold #BD93F9]- {report}")
+            console.print(f"  [bold #BD93F9]- {report}")
 
     @ staticmethod
     def delete_report(report_path, report_name, console):
@@ -329,7 +329,7 @@ class ExpenseReport:
         try:
             os.remove(report_path)
             console.print(
-                f"\n[bold #BD93F9]Successfully removed report: [#50FA7B]{report_name}")
+                f"\n[bold #50FA7B]Successfully removed report: '{report_name}'")
         except FileNotFoundError:
             print("Error: Report does not exist")
 
@@ -344,7 +344,6 @@ class ExpenseReport:
                 writer, sheet_name='Expense Report', index=False)
             summary_df.to_excel(
                 writer, sheet_name='Summary Report', index=False)
-            workbook = writer.book
 
     @staticmethod
     def handle_export_command(report_name, report_path, max_claimable_amount, console):
@@ -370,3 +369,26 @@ class ExpenseReport:
             report_df, summary_df, path)
         console.print(f"[bold #50FA7B]Exported Expense Report '{
                       report_name}' to {export_dir}")
+
+    @staticmethod
+    def rm_row(row_id, report_df):
+        """Delete a specified row in an expense report, based on the row ID"""
+        for item in report_df.values():
+            # row_id - 1 for correct indexing
+            del item[str(row_id - 1)]
+        return report_df
+
+    @staticmethod
+    def handle_rm_row(row_id, report_path, console):
+        """Handler method for rm --id command"""
+        report = ExpenseReport.load_expense_report(report_path)
+
+        try:
+            report = ExpenseReport.rm_row(row_id, report)
+        except KeyError:
+            console.print(f"[bold #FF5555]Report ID '{row_id}' does not exist")
+            sys.exit(1)
+
+        report_df = pd.DataFrame(report).reset_index(drop=True)
+        ExpenseReport.save_expense_report(report_df, report_path)
+        console.print(f"[bold #50FA7B]Deleted Report ID: {row_id}")

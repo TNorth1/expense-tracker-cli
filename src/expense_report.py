@@ -316,6 +316,11 @@ class ExpenseReport:
     def list_reports(storage_directory, console):
         """Lists the reports in a report storage directory"""
         report_names = os.listdir(storage_directory)
+        # if the report directory is empty
+        if report_names == []:
+            console.print("[bold #FF5555]There are no reports to list")
+            sys.exit(1)
+        
         # remove extensions from expense reports
         formatted_report_names = [file.split(".")[0] for file in report_names]
 

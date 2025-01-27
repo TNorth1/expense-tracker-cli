@@ -20,6 +20,7 @@ def main():
 
     config = Config.init_config()
     max_claimable_amount = Config.init_max_claimable_amount(config)
+    currency = Config.init_currency(config)
     # to print colourful text
     console = Console()
 
@@ -29,9 +30,9 @@ def main():
     elif ARGS.command == 'display':
         if ARGS.summary:
             ExpenseReport.display_summary(
-                REPORT_PATH, REPORT_NAME, max_claimable_amount, console)
+                REPORT_PATH, REPORT_NAME, max_claimable_amount, currency, console)
         else:
-            ExpenseReport.display_report(REPORT_PATH, REPORT_NAME, console)
+            ExpenseReport.display_report(REPORT_PATH, REPORT_NAME, currency, console)
     elif ARGS.command == 'update':
         ExpenseReport.add_new_report_row(REPORT_PATH)
     elif ARGS.command == 'ls':
@@ -42,10 +43,12 @@ def main():
         else:
             ExpenseReport.delete_report(REPORT_PATH, REPORT_NAME, console)
     elif ARGS.command == 'set-max':
-        Config.set_max_claimable_amount(config, ARGS.max_claimable_amount)
+        Config.set_config_setting(config, 'max_claimable_amount', ARGS.max_claimable_amount)
+    elif ARGS.command == 'set-currency':
+        Config.set_config_setting(config, 'currency', ARGS.currency)
     elif ARGS.command == 'export':
         ExpenseReport.handle_export_command(
-            REPORT_NAME, REPORT_PATH, max_claimable_amount, console)
+            REPORT_NAME, REPORT_PATH, max_claimable_amount, currency, console)
 
 
 if __name__ == "__main__":

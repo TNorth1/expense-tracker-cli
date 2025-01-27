@@ -16,7 +16,6 @@ def new_expense_report_name(filename):
         filename_without_ext = filename.split(".")[0]
         raise argparse.ArgumentTypeError(
             f"Report: '{filename_without_ext}' already exists")
-
     return filename
 
 
@@ -25,7 +24,6 @@ def is_valid_arg_directory(directory_path):
     if not os.path.isdir(directory_path):
         raise argparse.ArgumentTypeError(
             f"{directory_path} is not a valid path for a directory")
-
     return directory_path
 
 
@@ -47,13 +45,27 @@ def is_valid_expense_report(filename):
 
 
 def is_valid_arg_amount(value):
-    """Validates input for '--set-max-claimable-amount' option ensuring argument a monetary value"""
+    """Validates input for set-max subcommand arg ensuring argument a monetary value"""
     # if provided argument is not a valid monetary value, raise error
     if re.match(r'^\d+(\.\d{2})?$', value) is None:
         raise argparse.ArgumentTypeError(
             f"{value} is an invalid value. Enter a valid monetary value i.e. '10' or '10.01' NOT '10.1'")
-
     return float(value)
+
+
+def is_valid_currency(currency):
+    """Validates input for set-currency subcommand arg ensuring it is a valid currency"""
+    currency_symbols = [
+        "د.ج", "P", "£", "ج.م", "Br", "₵", "KSh", "د.م.", "₦", "R", "د.ت",
+        "֏", "৳", "Nu.", "¥", "元", "HK$", "₹", "Rp", "₪", "₸", "د.ك",
+        "RM", "₮", "ر.ع.", "₨", "₱", "ر.ق", "ر.س", "S$", "₩", "₫", "฿",
+        "₭", "₮", "៛", "₮", "€", "$", "C$", "A$", "NZ$", "₪", "CHF",
+        "руб", "₴", "₼", "₺", "₾", "£", "¥", "₹", "₨", "L", "₸", "₣", "£"
+    ]
+    if currency not in currency_symbols:
+        raise argparse.ArgumentTypeError(
+            f"'{currency}' is not a valid currency symbol")
+    return currency
 
 
 def parse_arguments():
@@ -89,7 +101,8 @@ def parse_arguments():
         'rm', help="Remove a specified expense report")
     rm_parser.add_argument(
         'filename', type=is_valid_expense_report, help="The name of the report to be deleted")
-    rm_parser.add_argument("--id", "-i", type=int, help="Specify a Report ID to be deleted.")
+    rm_parser.add_argument("--id", "-i", type=int,
+                           help="Specify a Report ID to be deleted.")
 
     # Subcommand 'set-max'
     set_max_parser = subparser.add_parser(
@@ -102,5 +115,11 @@ def parse_arguments():
         'export', help="Export a specified expense report to an excel spreadsheet")
     export_parser.add_argument(
         "filename", type=is_valid_expense_report, help="The name of the report to be exported")
+
+    # Subcommand 'set-currency'
+    set_currency_parser = subparser.add_parser(
+        'set-currency', help="Set the currency symbol to be used in the expense report")
+    set_currency_parser.add_argument(
+        "currency", type=is_valid_currency, help="The currency symbol to be used in reports")
 
     return parser.parse_args()

@@ -2,10 +2,12 @@ import json
 import os
 from src.user_input import UserInput
 
+
 class Config:
     DEFAULT_CONFIG_VALUE = "NOT_SET"
     DEFAULT_CONFIG_SETTINGS = {
-        "max_claimable_amount": DEFAULT_CONFIG_VALUE
+        "max_claimable_amount": DEFAULT_CONFIG_VALUE,
+        "currency": DEFAULT_CONFIG_VALUE
     }
 
     @staticmethod
@@ -36,11 +38,14 @@ class Config:
             json.dump(config_data, config_file, indent=4)
 
     @staticmethod
-    def is_valid_config_keys(config):
+    def validate_config_keys(config):
         """Checks if all of the keys in config.json are correct and untampered with.
-        returns True if valid
+        If a config key is missing, add it to the config and return the config
         """
-        return "max_claimable_amount" in config
+        for key in Config.DEFAULT_CONFIG_SETTINGS:
+            if key not in config:
+                config[key] = Config.DEFAULT_CONFIG_VALUE
+        return config
 
     @staticmethod
     def set_default_config_settings():
@@ -52,20 +57,19 @@ class Config:
     def init_config():
         """Initialise configuration settings for use in main"""
         config = Config.load_config()
-        if config is None or not Config.is_valid_config_keys(config):
+        if config is None:
             Config.set_default_config_settings()
             config = Config.load_config()
+            return config
+        # if config exists, ensure all config settings exist and add them
+        # to config.json if they do not
+        config = Config.validate_config_keys(config)
         return config
 
     @staticmethod
-    def get_max_claimable_amount(config):
-        """Returns the daily maximum amount allowed to be claimed in the expense report"""
-        return config["max_claimable_amount"]
-
-    @staticmethod
-    def set_max_claimable_amount(config, args_value):
+    def set_config_setting(config, setting_name, args_value):
         """Set the daily maximum amount allowed to be claimed in the expense report"""
-        config["max_claimable_amount"] = args_value
+        config[setting_name] = args_value
         Config.save_config(config)
 
     @staticmethod
@@ -77,10 +81,18 @@ class Config:
         max_claimable_amount = config["max_claimable_amount"]
         if max_claimable_amount == Config.DEFAULT_CONFIG_VALUE:
             max_claimable_amount = UserInput.prompt_for_max_claimable_amount()
-            Config.set_max_claimable_amount(config, max_claimable_amount)
+            Config.set_config_setting(
+                config, 'max_claimable_amount', max_claimable_amount)
         return max_claimable_amount
-    
-    
+
+    @staticmethod
+    def init_currency(config):
+        """Initialises the currency symbol to be used in the expense report for main"""
+        currency = config['currency']
+        if currency == Config.DEFAULT_CONFIG_VALUE:
+            currency = UserInput.prompt_for_currency()
+            Config.set_config_setting(config, 'currency', currency)
+        return currency
     # Currently not used, may be implemented later
     # @staticmethod
     # def prompt_for_directory():

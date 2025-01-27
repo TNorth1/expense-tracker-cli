@@ -143,18 +143,17 @@ class ExpenseReport:
         return report_df
 
     @staticmethod
-    def format_currency(value):
+    def format_currency(value, currency):
         """Format a an integer or float to a monetary value with a currency symbol"""
-        # TODO take currency as a parameter so currency can be changed in the config
         # if value float is a digit e.g. 10.0 value -> £10
         # else value float e.g. 10.01 -> £10.01
-        return f"£{int(value) if value == int(value) else round(value, 2)}"
+        return f"{currency}{int(value) if value == int(value) else round(value, 2)}"
 
     @staticmethod
-    def format_report_data(report_df):
+    def format_report_data(report_df, currency):
         """Formats the report rows to be viewed correctly in the terminal. e.g. 9.0 -> £9"""
         report_df['Amount'] = report_df['Amount'].apply(
-            ExpenseReport.format_currency)
+            lambda x: ExpenseReport.format_currency(x, currency))
         return report_df
 
     @ staticmethod
@@ -166,14 +165,14 @@ class ExpenseReport:
         return formatted_report_df
 
     @staticmethod
-    def format_summary_data(summary_df):
+    def format_summary_data(summary_df, currency):
         """Formats the report summary rows to be viewed correctly in the terminal e.g 9.0 -> £9"""
         # if value float is a digit e.g. 10.0 value -> £10
         # else value float e.g. 10.01 -> £10.01
         summary_df['Total'] = summary_df['Total'].apply(
-            ExpenseReport.format_currency)
+            lambda x: ExpenseReport.format_currency(x, currency))
         summary_df['Claimable Total'] = summary_df['Claimable Total'].apply(
-            ExpenseReport.format_currency)
+            lambda x: ExpenseReport.format_currency(x, currency))
         return summary_df
 
     @ staticmethod
@@ -246,7 +245,7 @@ class ExpenseReport:
         return table
 
     @staticmethod
-    def json_to_formatted_report_df(report_path):
+    def json_to_formatted_report_df(report_path, currency):
         """A Controller method to parse JSON report data to a formatted report df"""
         report_data = ExpenseReport.load_expense_report(report_path)
         if report_data is None:
@@ -256,14 +255,14 @@ class ExpenseReport:
         df_sorted = df.sort_values(by='Date').reset_index(drop=True)
         df_plus_total = ExpenseReport.df_add_total_row(df_sorted)
 
-        formatted_df = ExpenseReport.format_report_data(df_plus_total)
+        formatted_df = ExpenseReport.format_report_data(df_plus_total, currency)
         formatted_df = ExpenseReport.format_grand_total_cell(
             formatted_df, "Amount", "Total")
 
         return formatted_df
 
     @staticmethod
-    def json_to_formatted_summary_df(report_path, max_claimable_amount):
+    def json_to_formatted_summary_df(report_path, max_claimable_amount, currency):
         """A Controller method to parse JSON report data to a formatted report summary df"""
         report_data = ExpenseReport.load_expense_report(report_path)
         if report_data is None:
@@ -277,7 +276,7 @@ class ExpenseReport:
         df_renamed = ExpenseReport.df_rename_to_total_col(df_plus_claim_tot)
         df_plus_tot_row = ExpenseReport.add_summary_totals_row(df_renamed)
 
-        formatted_df1 = ExpenseReport.format_summary_data(df_plus_tot_row)
+        formatted_df1 = ExpenseReport.format_summary_data(df_plus_tot_row, currency)
         formatted_df2 = ExpenseReport.format_grand_total_cell(
             formatted_df1, "Total", "Total")
         final_formatted_df = ExpenseReport.format_grand_total_cell(
@@ -286,9 +285,9 @@ class ExpenseReport:
         return final_formatted_df
 
     @ staticmethod
-    def display_report(report_path, report_name, console):
+    def display_report(report_path, report_name, currency, console):
         """A controller method that displays a specified report"""
-        formatted_df = ExpenseReport.json_to_formatted_report_df(report_path)
+        formatted_df = ExpenseReport.json_to_formatted_report_df(report_path, currency)
 
         table = ExpenseReport.create_table("Expense Report", report_name)
         populated_table = ExpenseReport.populate_report_table(
@@ -299,10 +298,10 @@ class ExpenseReport:
         console.print(populated_table_with_total)
 
     @staticmethod
-    def display_summary(report_path, report_name, max_claimable_amount, console):
+    def display_summary(report_path, report_name, max_claimable_amount, currency, console):
         """A controller method that displays the summarised expense report, grouped by date"""
         formatted_report_df = ExpenseReport.json_to_formatted_summary_df(
-            report_path, max_claimable_amount)
+            report_path, max_claimable_amount, currency)
 
         table1 = ExpenseReport.create_table("Summary Report", report_name)
         table2 = ExpenseReport.populate_summary_table(
@@ -320,7 +319,7 @@ class ExpenseReport:
         if report_names == []:
             console.print("[bold #FF5555]There are no reports to list")
             sys.exit(1)
-        
+
         # remove extensions from expense reports
         formatted_report_names = [file.split(".")[0] for file in report_names]
 
@@ -351,11 +350,11 @@ class ExpenseReport:
                 writer, sheet_name='Summary Report', index=False)
 
     @staticmethod
-    def handle_export_command(report_name, report_path, max_claimable_amount, console):
+    def handle_export_command(report_name, report_path, max_claimable_amount, currency, console):
         """A handler method to control the logic for exporting the expense report and summary"""
-        report_df = ExpenseReport.json_to_formatted_report_df(report_path)
+        report_df = ExpenseReport.json_to_formatted_report_df(report_path, currency)
         summary_df = ExpenseReport.json_to_formatted_summary_df(
-            report_path, max_claimable_amount)
+            report_path, max_claimable_amount, currency)
 
         export_dir = UserInput.prompt_export_dir()
         if export_dir is None:

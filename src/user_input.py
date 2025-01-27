@@ -7,16 +7,6 @@ from PyQt5.QtCore import QStandardPaths
 class UserInput:
 
     @staticmethod
-    def prompt_for_max_claimable_amount():
-        """Prompt the user for daily maximum amount allowed to be claimed in the expense report"""
-        while True:
-            max_claimable_amount = input(
-                "Enter the daily maximum amount allowed to be claimed in expense reports: ")
-            if UserInput.is_valid_monetary_value(max_claimable_amount):
-                return float(max_claimable_amount)
-            print("Enter a valid monetary value i.e. '10' or '10.01' NOT '10.1'")
-
-    @staticmethod
     def is_valid_date(date_str):
         """Validate user input for date in the format yyyy-mm-dd"""
         try:
@@ -29,6 +19,38 @@ class UserInput:
     def is_valid_monetary_value(value_str):
         """Checks if a string is a valid monetary value (integer or float with up two decimal places)"""
         return re.match(r'^\d+(\.\d{2})?$', value_str) is not None
+    
+    @staticmethod
+    def is_valid_currency(currency):
+        """Checks if a currency str is a valid currency symbol"""
+        currency_symbol = [
+        "د.ج", "P", "£", "ج.م", "Br", "₵", "KSh", "د.م.", "₦", "R", "د.ت",
+        "֏", "৳", "Nu.", "¥", "元", "HK$", "₹", "Rp", "₪", "₸", "د.ك",
+        "RM", "₮", "ر.ع.", "₨", "₱", "ر.ق", "ر.س", "S$", "₩", "₫", "฿",
+        "₭", "₮", "៛", "₮", "€", "$", "C$", "A$", "NZ$", "₪", "CHF",
+        "руб", "₴", "₼", "₺", "₾", "£", "¥", "₹", "₨", "L", "₸", "₣", "£"
+    ]
+        return currency in currency_symbol
+
+    @staticmethod
+    def prompt_for_max_claimable_amount():
+        """Prompt the user for daily maximum amount allowed to be claimed in the expense report"""
+        while True:
+            max_claimable_amount = input(
+                "Enter the daily maximum amount allowed to be claimed in expense reports: ")
+            if UserInput.is_valid_monetary_value(max_claimable_amount):
+                return float(max_claimable_amount)
+            print("Enter a valid monetary value i.e. '10' or '10.01' NOT '10.1'")
+
+    @staticmethod
+    def prompt_for_currency():
+        """Prompt the user for the currency to be used in the expense report"""
+        while True:
+            currency = input(
+                "Enter the currency symbol to be used in expense reports: ")
+            if UserInput.is_valid_currency(currency):
+                return(currency)
+            print("Enter a valid currency i.e. £ or $ etc")
 
     @staticmethod
     def prompt_for_expense_cost():

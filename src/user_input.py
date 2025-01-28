@@ -19,17 +19,17 @@ class UserInput:
     def is_valid_monetary_value(value_str):
         """Checks if a string is a valid monetary value (integer or float with up two decimal places)"""
         return re.match(r'^\d+(\.\d{2})?$', value_str) is not None
-    
+
     @staticmethod
     def is_valid_currency(currency):
         """Checks if a currency str is a valid currency symbol"""
         currency_symbol = [
-        "د.ج", "P", "£", "ج.م", "Br", "₵", "KSh", "د.م.", "₦", "R", "د.ت",
-        "֏", "৳", "Nu.", "¥", "元", "HK$", "₹", "Rp", "₪", "₸", "د.ك",
-        "RM", "₮", "ر.ع.", "₨", "₱", "ر.ق", "ر.س", "S$", "₩", "₫", "฿",
-        "₭", "₮", "៛", "₮", "€", "$", "C$", "A$", "NZ$", "₪", "CHF",
-        "руб", "₴", "₼", "₺", "₾", "£", "¥", "₹", "₨", "L", "₸", "₣", "£"
-    ]
+            "د.ج", "P", "£", "ج.م", "Br", "₵", "KSh", "د.م.", "₦", "R", "د.ت",
+            "֏", "৳", "Nu.", "¥", "元", "HK$", "₹", "Rp", "₪", "₸", "د.ك",
+            "RM", "₮", "ر.ع.", "₨", "₱", "ر.ق", "ر.س", "S$", "₩", "₫", "฿",
+            "₭", "₮", "៛", "₮", "€", "$", "C$", "A$", "NZ$", "₪", "CHF",
+            "руб", "₴", "₼", "₺", "₾", "£", "¥", "₹", "₨", "L", "₸", "₣", "£"
+        ]
         return currency in currency_symbol
 
     @staticmethod
@@ -49,7 +49,7 @@ class UserInput:
             currency = input(
                 "Enter the currency symbol to be used in expense reports: ")
             if UserInput.is_valid_currency(currency):
-                return(currency)
+                return currency
             print("Enter a valid currency i.e. £ or $ etc")
 
     @staticmethod

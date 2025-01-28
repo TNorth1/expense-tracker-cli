@@ -6,15 +6,15 @@ from src.expense_report import ExpenseReport
 
 
 def main():
-    ARGS = cli_args.parse_arguments()
-    STORAGE_DIRECTORY = ExpenseReport.init_storage_directory()
+    args = cli_args.parse_arguments()
+    storage_directory = ExpenseReport.init_storage_directory()
     # Sets report's name, filename and path if a sub-command that interacts
     # with a file is used
     try:
-        REPORT_FILENAME = ARGS.filename
+        report_filename = args.filename
         # Report name = report file name without .json extension
-        REPORT_NAME = REPORT_FILENAME.split(".")[0]
-        REPORT_PATH = os.path.join(STORAGE_DIRECTORY, REPORT_FILENAME)
+        report_name = report_filename.split(".")[0]
+        report_path = os.path.join(storage_directory, report_filename)
     except AttributeError:
         pass
 
@@ -24,31 +24,33 @@ def main():
     # to print colourful text
     console = Console()
 
-    if ARGS.command == 'create':
+    if args.command == 'create':
         ExpenseReport.create_new_report(
-            STORAGE_DIRECTORY, REPORT_NAME, console)
-    elif ARGS.command == 'display':
-        if ARGS.summary:
+            storage_directory, report_name, console)
+    elif args.command == 'display':
+        if args.summary:
             ExpenseReport.display_summary(
-                REPORT_PATH, REPORT_NAME, max_claimable_amount, currency, console)
+                report_path, report_name, max_claimable_amount, currency, console)
         else:
-            ExpenseReport.display_report(REPORT_PATH, REPORT_NAME, currency, console)
-    elif ARGS.command == 'update':
-        ExpenseReport.add_new_report_row(REPORT_PATH)
-    elif ARGS.command == 'ls':
-        ExpenseReport.list_reports(STORAGE_DIRECTORY, console)
-    elif ARGS.command == 'rm':
-        if ARGS.id:
-            ExpenseReport.handle_rm_row(ARGS.id, REPORT_PATH, console)
+            ExpenseReport.display_report(
+                report_path, report_name, currency, console)
+    elif args.command == 'update':
+        ExpenseReport.add_new_report_row(report_path)
+    elif args.command == 'ls':
+        ExpenseReport.list_reports(storage_directory, console)
+    elif args.command == 'rm':
+        if args.id:
+            ExpenseReport.handle_rm_row(args.id, report_path, console)
         else:
-            ExpenseReport.delete_report(REPORT_PATH, REPORT_NAME, console)
-    elif ARGS.command == 'set-max':
-        Config.set_config_setting(config, 'max_claimable_amount', ARGS.max_claimable_amount)
-    elif ARGS.command == 'set-currency':
-        Config.set_config_setting(config, 'currency', ARGS.currency)
-    elif ARGS.command == 'export':
+            ExpenseReport.delete_report(report_path, report_name, console)
+    elif args.command == 'set-max':
+        Config.set_config_setting(
+            config, 'max_claimable_amount', args.max_claimable_amount)
+    elif args.command == 'set-currency':
+        Config.set_config_setting(config, 'currency', args.currency)
+    elif args.command == 'export':
         ExpenseReport.handle_export_command(
-            REPORT_NAME, REPORT_PATH, max_claimable_amount, currency, console)
+            report_name, report_path, max_claimable_amount, currency, console)
 
 
 if __name__ == "__main__":

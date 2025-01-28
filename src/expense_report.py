@@ -1,8 +1,8 @@
 import os
 import sys
 import json
-from rich.table import Table
 import pandas as pd
+from rich.table import Table
 from src.user_input import UserInput
 
 

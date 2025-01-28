@@ -93,34 +93,3 @@ class Config:
             currency = UserInput.prompt_for_currency()
             Config.set_config_setting(config, 'currency', currency)
         return currency
-    # Currently not used, may be implemented later
-    # @staticmethod
-    # def prompt_for_directory():
-    #     """
-    #     Prompt the user to input a valid directory path.
-    #     Returns the Directory if it is valid
-    #     """
-    #     while True:
-    #         directory = input("Set the directory to store expense reports: ")
-    #         if os.path.isdir(directory):
-    #             return directory
-    #         print("Directory does not exist, please try again or create the directory")
-
-    # Currently not used, may be implemented later
-    # @staticmethod
-    # def is_valid_config_directory(config):
-    #     """Returns true if the report_storage_directory setting is valid"""
-    #     return os.path.isdir(config["report_storage_directory"])
-
-    # Currently not used, may be implemented later
-    # @staticmethod
-    # def set_storage_directory(config):
-    #     """Sets the storage directory in config.json"""
-    #     config["report_storage_directory"] = Config.prompt_for_directory()
-    #     Config.save_config(config)
-
-    # Currently not used, may be implemented later
-    # @staticmethod
-    # def get_storage_directory(config):
-    #     """Returns the storage directory path for expense reports"""
-    #     return config["report_storage_directory"]

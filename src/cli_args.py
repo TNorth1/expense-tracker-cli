@@ -1,7 +1,8 @@
 import argparse
 import os
 import re
-from src.expense_report import ExpenseReport as er
+from src.expense_report import ExpenseReport
+from src.user_input import UserInput
 
 
 def new_expense_report_name(filename):
@@ -9,7 +10,7 @@ def new_expense_report_name(filename):
     if not filename.endswith(".json"):
         filename = f"{filename}.json"
 
-    storage_directory = er.get_storage_directory()
+    storage_directory = ExpenseReport.get_storage_directory()
     file_path = os.path.join(storage_directory, filename)
 
     if os.path.exists(file_path):
@@ -19,21 +20,13 @@ def new_expense_report_name(filename):
     return filename
 
 
-def is_valid_arg_directory(directory_path):
-    """Validates input for '--set-storage-directory' option ensuring argument is a valid directory path"""
-    if not os.path.isdir(directory_path):
-        raise argparse.ArgumentTypeError(
-            f"{directory_path} is not a valid path for a directory")
-    return directory_path
-
-
 def is_valid_expense_report(filename):
     """Validates input for expense report subcommand args, ensuring the specified expense report exists"""
     # if user enters the report name without the .json extension, append the extension
     if not filename.endswith(".json"):
         filename = filename + ".json"
 
-    storage_directory = er.get_storage_directory()
+    storage_directory = ExpenseReport.get_storage_directory()
     file_path = os.path.join(storage_directory, filename)
 
     if not os.path.exists(file_path):
@@ -55,17 +48,10 @@ def is_valid_arg_amount(value):
 
 def is_valid_currency(currency):
     """Validates input for set-currency subcommand arg ensuring it is a valid currency"""
-    currency_symbols = [
-        "د.ج", "P", "£", "ج.م", "Br", "₵", "KSh", "د.م.", "₦", "R", "د.ت",
-        "֏", "৳", "Nu.", "¥", "元", "HK$", "₹", "Rp", "₪", "₸", "د.ك",
-        "RM", "₮", "ر.ع.", "₨", "₱", "ر.ق", "ر.س", "S$", "₩", "₫", "฿",
-        "₭", "₮", "៛", "₮", "€", "$", "C$", "A$", "NZ$", "₪", "CHF",
-        "руб", "₴", "₼", "₺", "₾", "£", "¥", "₹", "₨", "L", "₸", "₣", "£"
-    ]
-    if currency not in currency_symbols:
-        raise argparse.ArgumentTypeError(
-            f"'{currency}' is not a valid currency symbol")
-    return currency
+    if UserInput.is_valid_currency(currency):
+        return currency
+    raise argparse.ArgumentTypeError(
+        f"'{currency}' is not a valid currency symbol")
 
 
 def parse_arguments():

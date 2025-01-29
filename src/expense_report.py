@@ -3,7 +3,7 @@ import sys
 import json
 import pandas as pd
 from rich.table import Table
-from src.user_input import UserInput
+from src import user_input
 
 
 class ExpenseReport:
@@ -84,10 +84,10 @@ class ExpenseReport:
         """A controller method to add a new row to a specified report"""
         add_another_row = True
         while add_another_row:
-            new_report_data = UserInput.get_report_data()
+            new_report_data = user_input.get_report_data()
             new_report_row = ExpenseReport.init_new_report_row(new_report_data)
             ExpenseReport.add_row_to_report(new_report_row, report_path)
-            add_another_row = UserInput.ask_to_add_another_row()
+            add_another_row = user_input.continue_adding_expenses()
 
     @staticmethod
     def df_rm_description(report_df):
@@ -255,7 +255,8 @@ class ExpenseReport:
         df_sorted = df.sort_values(by='Date').reset_index(drop=True)
         df_plus_total = ExpenseReport.df_add_total_row(df_sorted)
 
-        formatted_df = ExpenseReport.format_report_data(df_plus_total, currency)
+        formatted_df = ExpenseReport.format_report_data(
+            df_plus_total, currency)
         formatted_df = ExpenseReport.format_grand_total_cell(
             formatted_df, "Amount", "Total")
 
@@ -276,7 +277,8 @@ class ExpenseReport:
         df_renamed = ExpenseReport.df_rename_to_total_col(df_plus_claim_tot)
         df_plus_tot_row = ExpenseReport.add_summary_totals_row(df_renamed)
 
-        formatted_df1 = ExpenseReport.format_summary_data(df_plus_tot_row, currency)
+        formatted_df1 = ExpenseReport.format_summary_data(
+            df_plus_tot_row, currency)
         formatted_df2 = ExpenseReport.format_grand_total_cell(
             formatted_df1, "Total", "Total")
         final_formatted_df = ExpenseReport.format_grand_total_cell(
@@ -287,7 +289,8 @@ class ExpenseReport:
     @ staticmethod
     def display_report(report_path, report_name, currency, console):
         """A controller method that displays a specified report"""
-        formatted_df = ExpenseReport.json_to_formatted_report_df(report_path, currency)
+        formatted_df = ExpenseReport.json_to_formatted_report_df(
+            report_path, currency)
 
         table = ExpenseReport.create_table("Expense Report", report_name)
         populated_table = ExpenseReport.populate_report_table(
@@ -352,11 +355,12 @@ class ExpenseReport:
     @staticmethod
     def handle_export_command(report_name, report_path, max_claimable_amount, currency, console):
         """A handler method to control the logic for exporting the expense report and summary"""
-        report_df = ExpenseReport.json_to_formatted_report_df(report_path, currency)
+        report_df = ExpenseReport.json_to_formatted_report_df(
+            report_path, currency)
         summary_df = ExpenseReport.json_to_formatted_summary_df(
             report_path, max_claimable_amount, currency)
 
-        export_dir = UserInput.prompt_export_dir()
+        export_dir = user_input.prompt_export_dir()
         if export_dir is None:
             console.print("[bold #FF5555]No Directory selected")
             sys.exit(1)
@@ -365,7 +369,7 @@ class ExpenseReport:
         path = os.path.join(export_dir, output_file)
 
         if os.path.exists(path):
-            overwrite = UserInput.prompt_to_overwrite(path)
+            overwrite = user_input.prompt_file_overwrite(path)
             if not overwrite:
                 sys.exit(1)
 

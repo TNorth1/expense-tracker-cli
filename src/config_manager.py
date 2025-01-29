@@ -1,6 +1,6 @@
 import json
 import os
-from src.user_input import UserInput
+from src import user_input
 
 
 class Config:
@@ -80,7 +80,7 @@ class Config:
         """
         max_claimable_amount = config["max_claimable_amount"]
         if max_claimable_amount == Config.DEFAULT_CONFIG_VALUE:
-            max_claimable_amount = UserInput.prompt_for_max_claimable_amount()
+            max_claimable_amount = user_input.prompt_for_max_claimable_amount()
             Config.set_config_setting(
                 config, 'max_claimable_amount', max_claimable_amount)
         return max_claimable_amount
@@ -90,6 +90,6 @@ class Config:
         """Initialises the currency symbol to be used in the expense report for main"""
         currency = config['currency']
         if currency == Config.DEFAULT_CONFIG_VALUE:
-            currency = UserInput.prompt_for_currency()
+            currency = user_input.prompt_for_currency()
             Config.set_config_setting(config, 'currency', currency)
         return currency

@@ -2,7 +2,7 @@ import argparse
 import os
 import re
 from src.expense_report import ExpenseReport
-from src.user_input import UserInput
+from src import user_input
 
 
 def new_expense_report_name(filename):
@@ -48,7 +48,7 @@ def is_valid_arg_amount(value):
 
 def is_valid_currency(currency):
     """Validates input for set-currency subcommand arg ensuring it is a valid currency"""
-    if UserInput.is_valid_currency(currency):
+    if user_input.is_valid_currency(currency):
         return currency
     raise argparse.ArgumentTypeError(
         f"'{currency}' is not a valid currency symbol")

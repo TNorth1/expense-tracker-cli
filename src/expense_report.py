@@ -40,22 +40,6 @@ def save_expense_report(report_df, report_path):
         report_df.to_json(report_file, indent=4)
 
 
-def create_new_report(storage_directory, file_name, console):
-    """Create a new expense report with columns"""
-    file_name_with_ext = f"{file_name}.json"
-    path = f"{storage_directory}/{file_name_with_ext}"
-    columns = {
-        "Date": [],
-        "Amount": [],
-        "Description": [],
-    }
-    df_columns = pd.DataFrame(columns)
-    save_expense_report(df_columns, path)
-
-    console.print(
-        f"\n[bold #50FA7B]Created new report: '{file_name}'")
-
-
 def init_new_report_row(report_data):
     """Initialises a new report row"""
     report_row = {
@@ -75,16 +59,6 @@ def add_row_to_report(new_report_row, report_path):
     # sort report df by date and reset index so expense reports are in order
     report_df = report_df.sort_values(by="Date").reset_index(drop=True)
     save_expense_report(report_df, report_path)
-
-
-def add_new_report_row(report_path):
-    """A controller method to add a new row to a specified report"""
-    add_another_row = True
-    while add_another_row:
-        new_report_data = user_input.get_report_data()
-        new_report_row = init_new_report_row(new_report_data)
-        add_row_to_report(new_report_row, report_path)
-        add_another_row = user_input.continue_adding_expenses()
 
 
 def df_rm_description(report_df):
@@ -284,60 +258,6 @@ def json_to_formatted_summary_df(report_path, max_claimable_amount, currency):
     return final_formatted_df
 
 
-def display_report(report_path, report_name, currency, console):
-    """A controller method that displays a specified report"""
-    formatted_df = json_to_formatted_report_df(
-        report_path, currency)
-
-    table = create_table("Expense Report", report_name)
-    populated_table = populate_report_table(
-        table, formatted_df)
-    populated_table_with_total = populate_report_table_with_total(
-        populated_table, formatted_df)
-    print()
-    console.print(populated_table_with_total)
-
-
-def display_summary(report_path, report_name, max_claimable_amount, currency, console):
-    """A controller method that displays the summarised expense report, grouped by date"""
-    formatted_report_df = json_to_formatted_summary_df(
-        report_path, max_claimable_amount, currency)
-
-    table1 = create_table("Summary Report", report_name)
-    table2 = populate_summary_table(
-        table1, formatted_report_df)
-    table3 = populate_summary_table_with_totals(
-        table2, formatted_report_df)
-    print()
-    console.print(table3)
-
-
-def list_reports(storage_directory, console):
-    """Lists the reports in a report storage directory"""
-    report_names = os.listdir(storage_directory)
-    # if the report directory is empty
-    if report_names == []:
-        console.print("[bold #FF5555]There are no reports to list")
-        sys.exit(1)
-
-    # remove extensions from expense reports
-    formatted_report_names = [file.split(".")[0] for file in report_names]
-
-    console.print("\n[#50FA7B]Expense Reports:\n")
-    for report in formatted_report_names:
-        console.print(f"  [bold #BD93F9]- {report}")
-
-
-def delete_report(report_path, report_name, console):
-    """Delete a specified report"""
-    try:
-        os.remove(report_path)
-        console.print(
-            f"\n[bold #50FA7B]Successfully removed report: '{report_name}'")
-    except FileNotFoundError:
-        print("Error: Report does not exist")
-
-
 def export_report_and_summary(report_df, summary_df, export_path):
     """
     Export the expense report and the summary report into an excel spreadsheet,
@@ -350,50 +270,9 @@ def export_report_and_summary(report_df, summary_df, export_path):
             writer, sheet_name='Summary Report', index=False)
 
 
-def handle_export_command(report_name, report_path, max_claimable_amount, currency, console):
-    """A handler method to control the logic for exporting the expense report and summary"""
-    report_df = json_to_formatted_report_df(
-        report_path, currency)
-    summary_df = json_to_formatted_summary_df(
-        report_path, max_claimable_amount, currency)
-
-    export_dir = user_input.prompt_export_dir()
-    if export_dir is None:
-        console.print("[bold #FF5555]No Directory selected")
-        sys.exit(1)
-
-    output_file = f"{report_name}.xlsx"
-    path = os.path.join(export_dir, output_file)
-
-    if os.path.exists(path):
-        overwrite = user_input.prompt_file_overwrite(path)
-        if not overwrite:
-            sys.exit(1)
-
-    export_report_and_summary(
-        report_df, summary_df, path)
-    console.print(f"[bold #50FA7B]Exported Expense Report '{
-        report_name}' to {export_dir}")
-
-
 def rm_row(row_id, report_df):
     """Delete a specified row in an expense report, based on the row ID"""
     for item in report_df.values():
         # row_id - 1 for correct indexing
         del item[str(row_id - 1)]
     return report_df
-
-
-def handle_rm_row(row_id, report_path, console):
-    """Handler method for rm --id command"""
-    report = load_expense_report(report_path)
-
-    try:
-        report = rm_row(row_id, report)
-    except KeyError:
-        console.print(f"[bold #FF5555]Report ID '{row_id}' does not exist")
-        sys.exit(1)
-
-    report_df = pd.DataFrame(report).reset_index(drop=True)
-    save_expense_report(report_df, report_path)
-    console.print(f"[bold #50FA7B]Deleted Report ID: {row_id}")

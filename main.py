@@ -3,6 +3,7 @@ from rich.console import Console
 from src import cli_args
 from src.config_manager import Config
 from src import expense_report
+from src import commands
 
 
 def main():
@@ -25,32 +26,32 @@ def main():
     console = Console()
 
     if args.command == 'create':
-        expense_report.create_new_report(
+        commands.create_new_report(
             storage_directory, report_name, console)
     elif args.command == 'display':
         if args.summary:
-            expense_report.display_summary(
+            commands.display_summary(
                 report_path, report_name, max_claimable_amount, currency, console)
         else:
-            expense_report.display_report(
+            commands.display_report(
                 report_path, report_name, currency, console)
     elif args.command == 'update':
-        expense_report.add_new_report_row(report_path)
+        commands.add_new_report_row(report_path)
     elif args.command == 'ls':
-        expense_report.list_reports(storage_directory, console)
+        commands.list_reports(storage_directory, console)
     elif args.command == 'rm':
         if args.id:
-            expense_report.handle_rm_row(args.id, report_path, console)
+            commands.handle_rm_row(args.id, report_path, console)
         else:
-            expense_report.delete_report(report_path, report_name, console)
+            commands.delete_report(report_path, report_name, console)
+    elif args.command == 'export':
+        commands.handle_export_command(
+            report_name, report_path, max_claimable_amount, currency, console)
     elif args.command == 'set-max':
         Config.set_config_setting(
             config, 'max_claimable_amount', args.max_claimable_amount)
     elif args.command == 'set-currency':
         Config.set_config_setting(config, 'currency', args.currency)
-    elif args.command == 'export':
-        expense_report.handle_export_command(
-            report_name, report_path, max_claimable_amount, currency, console)
 
 
 if __name__ == "__main__":

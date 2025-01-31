@@ -4,15 +4,16 @@
 import os
 import sys
 import pandas as pd
+from rich.console import Console
 from src import config_manager
 from src import utils
 from src import user_input
 
 
-def create_new_report(storage_directory, file_name, console):
-    """Create a new expense report with columns"""
-    file_name_with_ext = f"{file_name}.json"
-    path = f"{storage_directory}/{file_name_with_ext}"
+def create_new_report(storage_directory: str, filename: str, console: Console) -> None:
+    """Create new expense report with columns"""
+    filename_with_ext = f"{filename}.json"
+    path = f"{storage_directory}/{filename_with_ext}"
     columns = {
         "Date": [],
         "Amount": [],
@@ -22,39 +23,45 @@ def create_new_report(storage_directory, file_name, console):
     utils.save_expense_report(df_columns, path)
 
     console.print(
-        f"\n[bold #50FA7B]Created new report: '{file_name}'")
+        f"\n[bold #50FA7B]Created new report: '{filename}'")
 
 
-def display_summary(report_path, report_name, max_claimable_amount, currency, console):
-    """A controller method that displays the summarised expense report, grouped by date"""
+def display_summary(
+    report_path: str,
+    report_name: str,
+    max_claimable_amount: float,
+    currency: str,
+    console: Console
+) -> None:
+    """Display summarised expense report grouped by date"""
     formatted_report_df = utils.json_to_formatted_summary_df(
         report_path, max_claimable_amount, currency)
 
-    table1 = utils.create_table("Summary Report", report_name)
-    table2 = utils.populate_summary_table(
-        table1, formatted_report_df)
-    table3 = utils.populate_summary_table_totals(
-        table2, formatted_report_df)
+    table = utils.create_table("Summary Report", report_name)
+    table = utils.populate_summary_table(
+        table, formatted_report_df)
+    table = utils.populate_summary_table_totals(
+        table, formatted_report_df)
     print()
-    console.print(table3)
+    console.print(table)
 
 
-def display_report(report_path, report_name, currency, console):
-    """A controller method that displays a specified report"""
+def display_report(report_path: str, report_name: str, currency: str, console: Console) -> None:
+    """Display expense report"""
     formatted_df = utils.json_to_formatted_report_df(
         report_path, currency)
 
     table = utils.create_table("Expense Report", report_name)
-    populated_table = utils.populate_report_table(
+    table = utils.populate_report_table(
         table, formatted_df)
-    populated_table_with_total = utils.populate_report_table_total(
-        populated_table, formatted_df)
+    table = utils.populate_report_table_total(
+        table, formatted_df)
     print()
-    console.print(populated_table_with_total)
+    console.print(table)
 
 
-def add_new_report_row(report_path):
-    """A controller method to add a new row to a specified report"""
+def add_new_report_entry(report_path: str) -> None:
+    """Add a new expense to report and ask user to add another expense"""
     continue_adding_expense = True
     while continue_adding_expense:
         report_data = user_input.get_report_data()
@@ -63,8 +70,8 @@ def add_new_report_row(report_path):
         continue_adding_expense = user_input.continue_adding_expenses()
 
 
-def list_reports(storage_directory, console):
-    """Lists the reports in a report storage directory"""
+def list_reports(storage_directory: str, console: Console) -> None:
+    """List reports in reports directory"""
     report_names = os.listdir(storage_directory)
     # if the report directory is empty
     if report_names == []:
@@ -79,8 +86,8 @@ def list_reports(storage_directory, console):
         console.print(f"  [bold #BD93F9]- {report}")
 
 
-def handle_rm_row(row_id, report_path, console):
-    """Handler method for rm --id command"""
+def handle_rm_row(row_id: int, report_path: str, console: Console) -> None:
+    """Remove expense entry by specified ID"""
     report = utils.load_expense_report(report_path)
 
     try:
@@ -94,7 +101,7 @@ def handle_rm_row(row_id, report_path, console):
     console.print(f"[bold #50FA7B]Deleted Report ID: {row_id}")
 
 
-def delete_report(report_path, report_name, console):
+def delete_report(report_path: str, report_name: str, console: Console) -> None:
     """Delete a specified report"""
     try:
         os.remove(report_path)
@@ -104,8 +111,14 @@ def delete_report(report_path, report_name, console):
         print("Error: Report does not exist")
 
 
-def handle_export_command(report_name, report_path, max_claimable_amount, currency, console):
-    """A handler method to control the logic for exporting the expense report and summary"""
+def export_report_to_xlsx(
+    report_name: str,
+    report_path: str,
+    max_claimable_amount: float,
+    currency: str,
+    console: Console
+) -> None:
+    """Export report to Excel spreadsheet"""
     report_df = utils.json_to_formatted_report_df(
         report_path, currency)
     summary_df = utils.json_to_formatted_summary_df(
@@ -124,7 +137,7 @@ def handle_export_command(report_name, report_path, max_claimable_amount, curren
         if not overwrite:
             sys.exit(1)
 
-    utils.export_report_and_summary(
+    utils.parse_report_to_xlsx(
         report_df, summary_df, path)
     console.print(f"[bold #50FA7B]Exported Expense Report '{
         report_name}' to {export_dir}")
@@ -133,8 +146,16 @@ def handle_export_command(report_name, report_path, max_claimable_amount, curren
 def set_config_setting(
         config: dict[str, str] | float,
         setting_name: str,
-        args_value: str | float
+        args_value: str | float,
+        console: Console
 ) -> None:
-    """Set daily max claimable amount for expense report"""
+    """Change a config setting value"""
     config[setting_name] = args_value
     config_manager.save_config(config)
+    if setting_name == "max_claimable_amount":
+        console.print(f"\n[bold #50FA7B]Max daily claimable amount set to: {
+            args_value}"
+        )
+    elif setting_name == "currency":
+        console.print(
+            f"\n[bold #50FA7B]Currency set to: '{args_value}'")

@@ -245,12 +245,12 @@ def populate_summary_table_totals(table: Table, summary_df: pd.DataFrame) -> Tab
     return table
 
 
-def export_report_and_summary(
+def parse_report_to_xlsx(
         report_df: pd.DataFrame,
         summary_df: pd.DataFrame,
         export_path: str
 ) -> None:
-    """Export expense and summary reports into an xlsx file"""
+    """Parse expense and summary report df's into an xlsx file"""
     with pd.ExcelWriter(export_path, engine='xlsxwriter') as writer:
         report_df.to_excel(
             writer, sheet_name='Expense Report', index=False)

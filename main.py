@@ -45,14 +45,14 @@ def main():
         else:
             commands.delete_report(report_path, report_name, console)
     elif args.command == 'export':
-        commands.handle_export_command(
+        commands.export_report_to_xlsx(
             report_name, report_path, max_claimable_amount, currency, console)
     elif args.command == 'set-max':
         commands.set_config_setting(
-            config, 'max_claimable_amount', args.max_claimable_amount)
+            config, 'max_claimable_amount', args.max_claimable_amount, console)
     elif args.command == 'set-currency':
         commands.set_config_setting(
-            config, 'currency', args.currency)
+            config, 'currency', args.currency, console)
 
 
 if __name__ == "__main__":

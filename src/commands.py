@@ -4,7 +4,7 @@
 import os
 import sys
 import pandas as pd
-from src.config_manager import Config
+from src import config_manager
 from src import utils
 from src import user_input
 
@@ -133,4 +133,4 @@ def handle_export_command(report_name, report_path, max_claimable_amount, curren
 def set_config_setting(config, setting_name, args_value):
     """Set the daily maximum amount allowed to be claimed in the expense report"""
     config[setting_name] = args_value
-    Config.save_config(config)
+    config_manager.save_config(config)

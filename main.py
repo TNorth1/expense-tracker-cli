@@ -1,7 +1,7 @@
 import os
 from rich.console import Console
 from src import cli_args
-from src.config_manager import Config
+from src import config_manager
 from src import utils
 from src import commands
 
@@ -19,9 +19,9 @@ def main():
     except AttributeError:
         pass
 
-    config = Config.init_config()
-    max_claimable_amount = Config.init_max_claimable_amount(config)
-    currency = Config.init_currency(config)
+    config = config_manager.init_config()
+    max_claimable_amount = config_manager.init_max_claimable_amount(config)
+    currency = config_manager.init_currency(config)
     # to print colourful text
     console = Console()
 
@@ -48,10 +48,10 @@ def main():
         commands.handle_export_command(
             report_name, report_path, max_claimable_amount, currency, console)
     elif args.command == 'set-max':
-        Config.set_config_setting(
+        config_manager.set_config_setting(
             config, 'max_claimable_amount', args.max_claimable_amount)
     elif args.command == 'set-currency':
-        Config.set_config_setting(config, 'currency', args.currency)
+        config_manager.set_config_setting(config, 'currency', args.currency)
 
 
 if __name__ == "__main__":

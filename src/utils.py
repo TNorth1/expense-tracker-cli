@@ -1,4 +1,4 @@
-"""Module housing expense report utility functions"""
+"""Module for expense report utility functions"""
 
 
 import os

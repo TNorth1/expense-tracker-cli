@@ -130,7 +130,11 @@ def handle_export_command(report_name, report_path, max_claimable_amount, curren
         report_name}' to {export_dir}")
 
 
-def set_config_setting(config, setting_name, args_value):
-    """Set the daily maximum amount allowed to be claimed in the expense report"""
+def set_config_setting(
+        config: dict[str, str] | float,
+        setting_name: str,
+        args_value: str | float
+) -> None:
+    """Set daily max claimable amount for expense report"""
     config[setting_name] = args_value
     config_manager.save_config(config)

@@ -48,10 +48,11 @@ def main():
         commands.handle_export_command(
             report_name, report_path, max_claimable_amount, currency, console)
     elif args.command == 'set-max':
-        config_manager.set_config_setting(
+        commands.set_config_setting(
             config, 'max_claimable_amount', args.max_claimable_amount)
     elif args.command == 'set-currency':
-        config_manager.set_config_setting(config, 'currency', args.currency)
+        commands.set_config_setting(
+            config, 'currency', args.currency)
 
 
 if __name__ == "__main__":

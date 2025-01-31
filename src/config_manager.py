@@ -4,6 +4,7 @@
 import json
 import os
 from src import user_input
+from src import commands
 
 
 DEFAULT_CONFIG_VALUE = "NOT_SET"
@@ -66,22 +67,12 @@ def init_config() -> dict[str, str | float]:
     return config
 
 
-def set_config_setting(
-        config: dict[str, str] | float,
-        setting_name: str,
-        args_value: str | float
-) -> None:
-    """Set daily max claimable amount for expense report"""
-    config[setting_name] = args_value
-    save_config(config)
-
-
 def init_max_claimable_amount(config: dict[str, str | float]) -> float:
     """Initialise max claimable amount for use in main"""
     max_claimable_amount = config["max_claimable_amount"]
     if max_claimable_amount == DEFAULT_CONFIG_VALUE:
         max_claimable_amount = user_input.prompt_for_max_claimable_amount()
-        set_config_setting(
+        commands.set_config_setting(
             config, 'max_claimable_amount', max_claimable_amount)
     return max_claimable_amount
 
@@ -91,5 +82,5 @@ def init_currency(config: dict[str, str | float]) -> float:
     currency = config['currency']
     if currency == DEFAULT_CONFIG_VALUE:
         currency = user_input.prompt_for_currency()
-        set_config_setting(config, 'currency', currency)
+        commands.set_config_setting(config, 'currency', currency)
     return currency

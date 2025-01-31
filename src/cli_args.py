@@ -1,7 +1,7 @@
 import argparse
 import os
 import re
-from src import expense_report
+from src import utils
 from src import user_input
 
 
@@ -10,7 +10,7 @@ def new_expense_report_name(filename):
     if not filename.endswith(".json"):
         filename = f"{filename}.json"
 
-    storage_directory = expense_report.get_storage_directory()
+    storage_directory = utils.get_storage_directory()
     file_path = os.path.join(storage_directory, filename)
 
     if os.path.exists(file_path):
@@ -26,7 +26,7 @@ def is_valid_expense_report(filename):
     if not filename.endswith(".json"):
         filename = filename + ".json"
 
-    storage_directory = expense_report.get_storage_directory()
+    storage_directory = utils.get_storage_directory()
     file_path = os.path.join(storage_directory, filename)
 
     if not os.path.exists(file_path):

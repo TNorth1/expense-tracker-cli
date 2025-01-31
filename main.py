@@ -2,13 +2,13 @@ import os
 from rich.console import Console
 from src import cli_args
 from src.config_manager import Config
-from src import expense_report
+from src import utils
 from src import commands
 
 
 def main():
     args = cli_args.parse_arguments()
-    storage_directory = expense_report.init_storage_directory()
+    storage_directory = utils.init_storage_directory()
     # Sets report's name, filename and path if a sub-command that interacts
     # with a file is used
     try:

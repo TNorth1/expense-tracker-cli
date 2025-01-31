@@ -5,7 +5,7 @@ import os
 import sys
 import pandas as pd
 from src.config_manager import Config
-from src import expense_report
+from src import utils
 from src import user_input
 
 
@@ -19,7 +19,7 @@ def create_new_report(storage_directory, file_name, console):
         "Description": [],
     }
     df_columns = pd.DataFrame(columns)
-    expense_report.save_expense_report(df_columns, path)
+    utils.save_expense_report(df_columns, path)
 
     console.print(
         f"\n[bold #50FA7B]Created new report: '{file_name}'")
@@ -27,13 +27,13 @@ def create_new_report(storage_directory, file_name, console):
 
 def display_summary(report_path, report_name, max_claimable_amount, currency, console):
     """A controller method that displays the summarised expense report, grouped by date"""
-    formatted_report_df = expense_report.json_to_formatted_summary_df(
+    formatted_report_df = utils.json_to_formatted_summary_df(
         report_path, max_claimable_amount, currency)
 
-    table1 = expense_report.create_table("Summary Report", report_name)
-    table2 = expense_report.populate_summary_table(
+    table1 = utils.create_table("Summary Report", report_name)
+    table2 = utils.populate_summary_table(
         table1, formatted_report_df)
-    table3 = expense_report.populate_summary_table_totals(
+    table3 = utils.populate_summary_table_totals(
         table2, formatted_report_df)
     print()
     console.print(table3)
@@ -41,13 +41,13 @@ def display_summary(report_path, report_name, max_claimable_amount, currency, co
 
 def display_report(report_path, report_name, currency, console):
     """A controller method that displays a specified report"""
-    formatted_df = expense_report.json_to_formatted_report_df(
+    formatted_df = utils.json_to_formatted_report_df(
         report_path, currency)
 
-    table = expense_report.create_table("Expense Report", report_name)
-    populated_table = expense_report.populate_report_table(
+    table = utils.create_table("Expense Report", report_name)
+    populated_table = utils.populate_report_table(
         table, formatted_df)
-    populated_table_with_total = expense_report.populate_report_table_total(
+    populated_table_with_total = utils.populate_report_table_total(
         populated_table, formatted_df)
     print()
     console.print(populated_table_with_total)
@@ -58,8 +58,8 @@ def add_new_report_row(report_path):
     continue_adding_expense = True
     while continue_adding_expense:
         report_data = user_input.get_report_data()
-        expense = expense_report.init_new_expense(report_data)
-        expense_report.add_expense_to_report(expense, report_path)
+        expense = utils.init_new_expense(report_data)
+        utils.add_expense_to_report(expense, report_path)
         continue_adding_expense = user_input.continue_adding_expenses()
 
 
@@ -81,16 +81,16 @@ def list_reports(storage_directory, console):
 
 def handle_rm_row(row_id, report_path, console):
     """Handler method for rm --id command"""
-    report = expense_report.load_expense_report(report_path)
+    report = utils.load_expense_report(report_path)
 
     try:
-        report = expense_report.rm_row(row_id, report)
+        report = utils.rm_row(row_id, report)
     except KeyError:
         console.print(f"[bold #FF5555]Report ID '{row_id}' does not exist")
         sys.exit(1)
 
     report_df = pd.DataFrame(report).reset_index(drop=True)
-    expense_report.save_expense_report(report_df, report_path)
+    utils.save_expense_report(report_df, report_path)
     console.print(f"[bold #50FA7B]Deleted Report ID: {row_id}")
 
 
@@ -106,9 +106,9 @@ def delete_report(report_path, report_name, console):
 
 def handle_export_command(report_name, report_path, max_claimable_amount, currency, console):
     """A handler method to control the logic for exporting the expense report and summary"""
-    report_df = expense_report.json_to_formatted_report_df(
+    report_df = utils.json_to_formatted_report_df(
         report_path, currency)
-    summary_df = expense_report.json_to_formatted_summary_df(
+    summary_df = utils.json_to_formatted_summary_df(
         report_path, max_claimable_amount, currency)
 
     export_dir = user_input.prompt_export_dir()
@@ -124,7 +124,7 @@ def handle_export_command(report_name, report_path, max_claimable_amount, curren
         if not overwrite:
             sys.exit(1)
 
-    expense_report.export_report_and_summary(
+    utils.export_report_and_summary(
         report_df, summary_df, path)
     console.print(f"[bold #50FA7B]Exported Expense Report '{
         report_name}' to {export_dir}")

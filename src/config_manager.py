@@ -77,7 +77,7 @@ def init_max_claimable_amount(config: dict[str, str | float]) -> float:
     return max_claimable_amount
 
 
-def init_currency(config: dict[str, str | float]) -> float:
+def init_currency(config: dict[str, str | float]) -> str:
     """Initialises currency symbol for use in main"""
     currency = config['currency']
     if currency == DEFAULT_CONFIG_VALUE:

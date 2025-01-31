@@ -1,4 +1,4 @@
-"""Module for functions linked to cli sub-commands"""
+"""Module for functions called by cli sub-commands"""
 
 
 import os
@@ -33,7 +33,7 @@ def display_summary(report_path, report_name, max_claimable_amount, currency, co
     table1 = expense_report.create_table("Summary Report", report_name)
     table2 = expense_report.populate_summary_table(
         table1, formatted_report_df)
-    table3 = expense_report.populate_summary_table_with_totals(
+    table3 = expense_report.populate_summary_table_totals(
         table2, formatted_report_df)
     print()
     console.print(table3)
@@ -47,7 +47,7 @@ def display_report(report_path, report_name, currency, console):
     table = expense_report.create_table("Expense Report", report_name)
     populated_table = expense_report.populate_report_table(
         table, formatted_df)
-    populated_table_with_total = expense_report.populate_report_table_with_total(
+    populated_table_with_total = expense_report.populate_report_table_total(
         populated_table, formatted_df)
     print()
     console.print(populated_table_with_total)
@@ -55,12 +55,12 @@ def display_report(report_path, report_name, currency, console):
 
 def add_new_report_row(report_path):
     """A controller method to add a new row to a specified report"""
-    add_another_row = True
-    while add_another_row:
-        new_report_data = user_input.get_report_data()
-        new_report_row = expense_report.init_new_report_row(new_report_data)
-        expense_report.add_row_to_report(new_report_row, report_path)
-        add_another_row = user_input.continue_adding_expenses()
+    continue_adding_expense = True
+    while continue_adding_expense:
+        report_data = user_input.get_report_data()
+        expense = expense_report.init_new_expense(report_data)
+        expense_report.add_expense_to_report(expense, report_path)
+        continue_adding_expense = user_input.continue_adding_expenses()
 
 
 def list_reports(storage_directory, console):

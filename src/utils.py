@@ -76,7 +76,7 @@ def rename_amount_to_total(report_df: pd.DataFrame) -> pd.DataFrame:
 def add_claimable_total(report_df: pd.DataFrame, max_claimable_amount: bool) -> pd.DataFrame:
     """Add Claimable Total col to summary report"""
     report_df['Claimable Total'] = report_df['Amount'].apply(
-        lambda x: min(x, max_claimable_amount))
+        lambda x: x if max_claimable_amount == 'unlimited' else min(x, max_claimable_amount))
     return report_df
 
 

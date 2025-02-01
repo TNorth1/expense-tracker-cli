@@ -41,8 +41,10 @@ def prompt_for_max_claimable_amount() -> float:
     """Prompt for maximum daily claimable amount"""
     while True:
         print("Enter maximum daily claim amount")
-        print("Format: Whole number or 2 decimals (50 or 50.01)")
+        print("Format: Whole number or 2 decimals (50 or 50.01) or 'unlimited'")
         max_claimable_amount = input("Amount: ")
+        if max_claimable_amount == "unlimited":
+            return max_claimable_amount
         if is_valid_monetary_value(max_claimable_amount):
             return float(max_claimable_amount)
 

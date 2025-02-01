@@ -43,9 +43,11 @@ def is_valid_expense_report(filename):
 def is_valid_arg_amount(value):
     """Validates input for set-max subcommand arg ensuring argument a monetary value"""
     # if provided argument is not a valid monetary value, raise error
-    if re.match(r'^\d+(\.\d{2})?$', value) is None:
+    if value == 'unlimited':
+        return value
+    elif re.match(r'^\d+(\.\d{2})?$', value) is None:
         raise argparse.ArgumentTypeError(
-            f"{value} is an invalid value. Enter a valid monetary value i.e. '10' or '10.01' NOT '10.1'")
+            f"{value} is invalid. Enter valid value i.e. '10' or '10.01' or unlimited")
     return float(value)
 
 

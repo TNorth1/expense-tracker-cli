@@ -72,7 +72,7 @@ def init_max_claimable_amount(config: dict[str, str | float], console: Console) 
     """Initialise max claimable amount for use in main"""
     max_claimable_amount = config["max_claimable_amount"]
     if max_claimable_amount == DEFAULT_CONFIG_VALUE:
-        console.print("\n[bold #FF5555] No currency symbol set\n")
+        console.print("\n[bold #FF5555] Max claimable amount is not set\n")
         max_claimable_amount = user_input.prompt_for_max_claimable_amount()
         commands.set_config_setting(
             config, 'max_claimable_amount', max_claimable_amount, console)
@@ -83,7 +83,7 @@ def init_currency(config: dict[str, str | float], console: Console) -> str:
     """Initialises currency symbol for use in main"""
     currency = config['currency']
     if currency == DEFAULT_CONFIG_VALUE:
-        console.print("\n[bold #FF5555] No currency symbol set\n")
+        console.print("\n[bold #FF5555] The currency symbol is not set\n")
         currency = user_input.prompt_for_currency()
         commands.set_config_setting(config, 'currency', currency, console)
     return currency

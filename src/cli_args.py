@@ -9,7 +9,7 @@ from src import user_input
 
 
 def new_expense_report_name(filename):
-    """Validates and adds .json extension to filename if it is not present when creating a new report"""
+    """Validates and adds .json extension to filename if not present"""
     if not filename.endswith(".json"):
         filename = f"{filename}.json"
 
@@ -24,7 +24,7 @@ def new_expense_report_name(filename):
 
 
 def is_valid_expense_report(filename):
-    """Validates input for expense report subcommand args, ensuring the specified expense report exists"""
+    """Validates expense report filename argument, ensuring it exists"""
     # if user enters the report name without the .json extension, append the extension
     if not filename.endswith(".json"):
         filename = filename + ".json"
@@ -41,18 +41,18 @@ def is_valid_expense_report(filename):
 
 
 def is_valid_arg_amount(value):
-    """Validates input for set-max subcommand arg ensuring argument a monetary value"""
+    """Validates input for set-max subcommand arg"""
     # if provided argument is not a valid monetary value, raise error
     if value == 'unlimited':
         return value
-    elif re.match(r'^\d+(\.\d{2})?$', value) is None:
+    if re.match(r'^\d+(\.\d{2})?$', value) is None:
         raise argparse.ArgumentTypeError(
             f"{value} is invalid. Enter valid value i.e. '10' or '10.01' or unlimited")
     return float(value)
 
 
 def is_valid_currency(currency):
-    """Validates input for set-currency subcommand arg ensuring it is a valid currency"""
+    """Validates input for set-currency subcommand arg"""
     if user_input.is_valid_currency(currency):
         return currency
     raise argparse.ArgumentTypeError(

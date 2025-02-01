@@ -1,3 +1,6 @@
+"""Main module"""
+
+
 import os
 from rich.console import Console
 from src import cli_args
@@ -19,11 +22,12 @@ def main():
     except AttributeError:
         pass
 
-    config = config_manager.init_config()
-    max_claimable_amount = config_manager.init_max_claimable_amount(config)
-    currency = config_manager.init_currency(config)
-    # to print colourful text
     console = Console()
+
+    config = config_manager.init_config()
+    max_claimable_amount = config_manager.init_max_claimable_amount(
+        config, console)
+    currency = config_manager.init_currency(config, console)
 
     if args.command == 'create':
         commands.create_new_report(
@@ -36,7 +40,7 @@ def main():
             commands.display_report(
                 report_path, report_name, currency, console)
     elif args.command == 'update':
-        commands.add_new_report_row(report_path)
+        commands.add_new_report_entry(report_path)
     elif args.command == 'ls':
         commands.list_reports(storage_directory, console)
     elif args.command == 'rm':

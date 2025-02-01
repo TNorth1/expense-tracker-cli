@@ -3,6 +3,7 @@
 
 import json
 import os
+from rich.console import Console
 from src import user_input
 from src import commands
 
@@ -67,20 +68,22 @@ def init_config() -> dict[str, str | float]:
     return config
 
 
-def init_max_claimable_amount(config: dict[str, str | float]) -> float:
+def init_max_claimable_amount(config: dict[str, str | float], console: Console) -> float:
     """Initialise max claimable amount for use in main"""
     max_claimable_amount = config["max_claimable_amount"]
     if max_claimable_amount == DEFAULT_CONFIG_VALUE:
+        console.print("\n[bold #FF5555] No currency symbol set\n")
         max_claimable_amount = user_input.prompt_for_max_claimable_amount()
         commands.set_config_setting(
-            config, 'max_claimable_amount', max_claimable_amount)
+            config, 'max_claimable_amount', max_claimable_amount, console)
     return max_claimable_amount
 
 
-def init_currency(config: dict[str, str | float]) -> str:
+def init_currency(config: dict[str, str | float], console: Console) -> str:
     """Initialises currency symbol for use in main"""
     currency = config['currency']
     if currency == DEFAULT_CONFIG_VALUE:
+        console.print("\n[bold #FF5555] No currency symbol set\n")
         currency = user_input.prompt_for_currency()
-        commands.set_config_setting(config, 'currency', currency)
+        commands.set_config_setting(config, 'currency', currency, console)
     return currency

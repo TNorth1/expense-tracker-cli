@@ -1,3 +1,6 @@
+"""Module for CLI subcommand and argument validation functions"""
+
+
 import argparse
 import os
 import re

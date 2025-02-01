@@ -15,9 +15,9 @@ DEFAULT_CONFIG_SETTINGS = {
 
 
 def get_config_path() -> str:
-    """Returns config.json absolute path"""
+    """Returns .config.json absolute path"""
     current_directory = os.path.dirname(os.path.abspath(__file__))
-    config_path = os.path.join(os.path.dirname(current_directory), "config.json")
+    config_path = os.path.join(os.path.dirname(current_directory), ".config.json")
     return config_path
 
 
@@ -31,14 +31,14 @@ def load_config() -> dict[str, str | float] | None:
 
 
 def save_config(config: dict[str, str | float]) -> None:
-    """Update config.json with new config data"""
+    """Update .config.json with new config data"""
     with open(get_config_path(), "w") as config_file:
         json.dump(config, config_file, indent=4)
 
 
 def validate_config_keys(config: dict[str, str | float]) -> dict[str, str | float]:
     """
-    Check if all keys in config.json are valid.
+    Check if all keys in .config.json are valid.
     If a config key is missing, add it to config.
     """
     for key in DEFAULT_CONFIG_SETTINGS:
@@ -48,7 +48,7 @@ def validate_config_keys(config: dict[str, str | float]) -> dict[str, str | floa
 
 
 def set_default_config_settings() -> None:
-    """Reset config.json to default settings"""
+    """Reset .config.json to default settings"""
     config = DEFAULT_CONFIG_SETTINGS
     save_config(config)
 
@@ -61,7 +61,7 @@ def init_config() -> dict[str, str | float]:
         config = load_config()
         return config
     # if config exists, ensure all config settings exist and add them
-    # to config.json if they do not
+    # to .config.json if they do not
     config = validate_config_keys(config)
     return config
 

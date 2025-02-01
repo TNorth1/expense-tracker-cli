@@ -1,6 +1,5 @@
 """Module for expense report utility functions"""
 
-
 import os
 import json
 import pandas as pd
@@ -10,8 +9,7 @@ from rich.table import Table
 def get_storage_directory() -> str:
     """Returns absolute path of report storage directory"""
     current_directory = os.path.dirname(os.path.abspath(__file__))
-    storage_directory = os.path.join(
-        os.path.dirname(current_directory), 'reports')
+    storage_directory = os.path.join(os.path.dirname(current_directory), "reports")
     return storage_directory
 
 
@@ -70,37 +68,34 @@ def group_by_date(report_df: pd.DataFrame) -> pd.DataFrame:
 
 def rename_amount_to_total(report_df: pd.DataFrame) -> pd.DataFrame:
     """Rename the 'Amount' column to 'Total' in summary report"""
-    return report_df.rename(columns={'Amount': 'Total'})
+    return report_df.rename(columns={"Amount": "Total"})
 
 
-def add_claimable_total(report_df: pd.DataFrame, max_claimable_amount: bool) -> pd.DataFrame:
+def add_claimable_total(
+    report_df: pd.DataFrame, max_claimable_amount: float | str
+) -> pd.DataFrame:
     """Add Claimable Total col to summary report"""
-    report_df['Claimable Total'] = report_df['Amount'].apply(
-        lambda x: x if max_claimable_amount == 'unlimited' else min(x, max_claimable_amount))
+    report_df["Claimable Total"] = report_df["Amount"].apply(
+        lambda x: (
+            x if max_claimable_amount == "unlimited" else min(x, max_claimable_amount)
+        )
+    )
     return report_df
 
 
 def add_summary_totals_row(report_df: pd.DataFrame) -> pd.DataFrame:
     """Add row containing grand total and claimable grand total to the summary report"""
-    grand_total = report_df['Total'].sum().round(2)
-    claimable_total = report_df['Claimable Total'].sum().round(2)
-    totals_row = {
-        "Date": "",
-        "Total": grand_total,
-        "Claimable Total": claimable_total
-    }
+    grand_total = report_df["Total"].sum().round(2)
+    claimable_total = report_df["Claimable Total"].sum().round(2)
+    totals_row = {"Date": "", "Total": grand_total, "Claimable Total": claimable_total}
     report_df.loc[len(report_df)] = totals_row
     return report_df
 
 
 def df_add_total_row(report_df: pd.DataFrame) -> pd.DataFrame:
     """Add total amount row to the report"""
-    total = report_df['Amount'].sum().round(2)
-    total_row = {
-        "Date": "",
-        "Amount": total,
-        "Description": ""
-    }
+    total = report_df["Amount"].sum().round(2)
+    total_row = {"Date": "", "Amount": total, "Description": ""}
     report_df.loc[len(report_df)] = total_row
     return report_df
 
@@ -114,12 +109,15 @@ def format_currency(value: float, currency: str) -> str:
 
 def format_report_data(report_df: pd.DataFrame, currency: str) -> pd.DataFrame:
     """Format report rows e.g. 9.0 -> £9"""
-    report_df['Amount'] = report_df['Amount'].apply(
-        lambda x: format_currency(x, currency))
+    report_df["Amount"] = report_df["Amount"].apply(
+        lambda x: format_currency(x, currency)
+    )
     return report_df
 
 
-def format_grand_total_cell(report_df: pd.DataFrame, col: str, total_type: str) -> pd.DataFrame:
+def format_grand_total_cell(
+    report_df: pd.DataFrame, col: str, total_type: str
+) -> pd.DataFrame:
     """Format total row, adding prefix to total values"""
     cell = report_df[col].iloc[-1]
     report_df.loc[report_df.index[-1], col] = f"{total_type}: {cell}"
@@ -128,10 +126,12 @@ def format_grand_total_cell(report_df: pd.DataFrame, col: str, total_type: str) 
 
 def format_summary_data(summary_df: pd.DataFrame, currency: str) -> pd.DataFrame:
     """Format report summary rows e.g 9.0 -> £9"""
-    summary_df['Total'] = summary_df['Total'].apply(
-        lambda x: format_currency(x, currency))
-    summary_df['Claimable Total'] = summary_df['Claimable Total'].apply(
-        lambda x: format_currency(x, currency))
+    summary_df["Total"] = summary_df["Total"].apply(
+        lambda x: format_currency(x, currency)
+    )
+    summary_df["Claimable Total"] = summary_df["Claimable Total"].apply(
+        lambda x: format_currency(x, currency)
+    )
     return summary_df
 
 
@@ -142,26 +142,26 @@ def format_summary_totals_cell(summary_df: pd.DataFrame, col: str) -> pd.DataFra
     return summary_df
 
 
-def json_to_formatted_report_df(report_path, currency):
-    """Parse JSON report data to a formatted report df"""
+def json_to_formatted_report_df(report_path: str, currency: str) -> pd.DataFrame:
+    """Parse JSON report data to formatted report df"""
     report_data = load_expense_report(report_path)
     if report_data is None:
         raise FileNotFoundError("Error: Report does not exist")
 
     df = pd.DataFrame(report_data)
-    df_sorted = df.sort_values(by='Date').reset_index(drop=True)
+    df_sorted = df.sort_values(by="Date").reset_index(drop=True)
     df_plus_total = df_add_total_row(df_sorted)
 
-    formatted_df = format_report_data(
-        df_plus_total, currency)
-    formatted_df = format_grand_total_cell(
-        formatted_df, "Amount", "Total")
+    formatted_df = format_report_data(df_plus_total, currency)
+    formatted_df = format_grand_total_cell(formatted_df, "Amount", "Total")
 
     return formatted_df
 
 
-def json_to_formatted_summary_df(report_path, max_claimable_amount, currency):
-    """Parse JSON report data to a formatted report summary df"""
+def json_to_formatted_summary_df(
+    report_path: str, max_claimable_amount: float | str, currency: str
+) -> pd.DataFrame:
+    """Parse JSON report data to formatted report summary df"""
     report_data = load_expense_report(report_path)
     if report_data is None:
         raise FileNotFoundError("Error: Report does not exist")
@@ -169,17 +169,15 @@ def json_to_formatted_summary_df(report_path, max_claimable_amount, currency):
     df = pd.DataFrame(report_data)
     df_minus_descrip = rm_description(df)
     df_grouped = group_by_date(df_minus_descrip)
-    df_plus_claim_tot = add_claimable_total(
-        df_grouped, max_claimable_amount)
+    df_plus_claim_tot = add_claimable_total(df_grouped, max_claimable_amount)
     df_renamed = rename_amount_to_total(df_plus_claim_tot)
     df_plus_tot_row = add_summary_totals_row(df_renamed)
 
-    formatted_df1 = format_summary_data(
-        df_plus_tot_row, currency)
-    formatted_df2 = format_grand_total_cell(
-        formatted_df1, "Total", "Total")
+    formatted_df1 = format_summary_data(df_plus_tot_row, currency)
+    formatted_df2 = format_grand_total_cell(formatted_df1, "Total", "Total")
     final_formatted_df = format_grand_total_cell(
-        formatted_df2, "Claimable Total", "Total")
+        formatted_df2, "Claimable Total", "Total"
+    )
 
     return final_formatted_df
 
@@ -187,8 +185,11 @@ def json_to_formatted_summary_df(report_path, max_claimable_amount, currency):
 def create_table(title_prefix: str, report_name: str) -> Table:
     """Creates table object and sets the colours"""
     # Dracula Purple - #BD93F9        Dracula green - #50FA7B
-    table = Table(title=f"{title_prefix}: {report_name}",
-                  header_style="bold #BD93F9", border_style="#50FA7B")
+    table = Table(
+        title=f"{title_prefix}: {report_name}",
+        header_style="bold #BD93F9",
+        border_style="#50FA7B",
+    )
     return table
 
 
@@ -201,8 +202,10 @@ def populate_report_table(table: Table, report_df: pd.DataFrame) -> Table:
 
     # Add all rows to table except total row
     for index, row in report_df[:-1].iterrows():
-        table.add_row(*[str(index + 1), row['Date'],
-                        row['Amount'], row['Description']], style="bold #F859A8")
+        table.add_row(
+            *[str(index + 1), row["Date"], row["Amount"], row["Description"]],
+            style="bold #F859A8",
+        )
         # Add a line between each row
         table.add_section()
     return table
@@ -212,8 +215,8 @@ def populate_report_table_total(table: Table, report_df: pd.DataFrame) -> Table:
     """Populate table with total row"""
     # Add extra line after report data rows
     table.add_section()
-    total_amount = report_df['Amount'].iloc[-1]
-    table.add_row(*['', '', total_amount], style="bold yellow")
+    total_amount = report_df["Amount"].iloc[-1]
+    table.add_row(*["", "", total_amount], style="bold yellow")
     return table
 
 
@@ -225,11 +228,15 @@ def populate_summary_table(table: Table, summary_df: pd.DataFrame) -> Table:
         table.add_column(col)
 
     # Add all rows from to table except total row
-    lst_data = [summary_df["Date"], summary_df["Total"].tolist(
-    ), summary_df["Claimable Total"].tolist()]
+    lst_data = [
+        summary_df["Date"],
+        summary_df["Total"].tolist(),
+        summary_df["Claimable Total"].tolist(),
+    ]
     for i in range(len(summary_df) - 1):
         table.add_row(
-            *[str(lst_data[0][i]), lst_data[1][i], lst_data[2][i]], style='bold #F859A8')
+            *[str(lst_data[0][i]), lst_data[1][i], lst_data[2][i]], style="bold #F859A8"
+        )
         # Add a line between each row
         table.add_section()
     return table
@@ -239,23 +246,19 @@ def populate_summary_table_totals(table: Table, summary_df: pd.DataFrame) -> Tab
     """Populate table with the totals row"""
     # Add extra line after report data rows
     table.add_section()
-    grand_total = summary_df['Total'].iloc[-1]
-    claimable_total = summary_df['Claimable Total'].iloc[-1]
-    table.add_row(*['', grand_total, claimable_total], style="bold yellow")
+    grand_total = summary_df["Total"].iloc[-1]
+    claimable_total = summary_df["Claimable Total"].iloc[-1]
+    table.add_row(*["", grand_total, claimable_total], style="bold yellow")
     return table
 
 
 def parse_report_to_xlsx(
-        report_df: pd.DataFrame,
-        summary_df: pd.DataFrame,
-        export_path: str
+    report_df: pd.DataFrame, summary_df: pd.DataFrame, export_path: str
 ) -> None:
     """Parse expense and summary report df's into an xlsx file"""
-    with pd.ExcelWriter(export_path, engine='xlsxwriter') as writer:
-        report_df.to_excel(
-            writer, sheet_name='Expense Report', index=False)
-        summary_df.to_excel(
-            writer, sheet_name='Summary Report', index=False)
+    with pd.ExcelWriter(export_path, engine="xlsxwriter") as writer:
+        report_df.to_excel(writer, sheet_name="Expense Report", index=False)
+        summary_df.to_excel(writer, sheet_name="Summary Report", index=False)
 
 
 def rm_row(row_id: int, report_df: pd.DataFrame) -> pd.DataFrame:

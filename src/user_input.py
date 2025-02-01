@@ -1,6 +1,5 @@
 """Module for handling user input and validation in expense tracking system"""
 
-
 from datetime import datetime
 import re
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox
@@ -104,17 +103,19 @@ def continue_adding_expenses() -> bool:
         print("Do you want to add another entry?")
         response = input("[y/n]: ")
         if response.lower() in ["y", "n"]:
-            return response == 'y'
+            return response == "y"
 
 
 def prompt_export_dir() -> str | None:
     """Prompt user to select directory for file export"""
     # Open file explorer gui in downloads directory (platform agnostic)
     default_download_path = QStandardPaths.writableLocation(
-        QStandardPaths.DownloadLocation)
+        QStandardPaths.DownloadLocation
+    )
     app = QApplication([])  # Create the application object
     export_dir = QFileDialog.getExistingDirectory(
-        None, "Select a Directory", default_download_path)
+        None, "Select a Directory", default_download_path
+    )
 
     if export_dir:
         return export_dir

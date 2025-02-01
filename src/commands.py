@@ -1,6 +1,5 @@
 """Module for functions called by cli sub-commands"""
 
-
 import os
 import sys
 import pandas as pd
@@ -22,40 +21,37 @@ def create_new_report(storage_directory: str, filename: str, console: Console) -
     df_columns = pd.DataFrame(columns)
     utils.save_expense_report(df_columns, path)
 
-    console.print(
-        f"\n[bold #50FA7B]Created new report: '{filename}'")
+    console.print(f"\n[bold #50FA7B]Created new report: '{filename}'")
 
 
 def display_summary(
     report_path: str,
     report_name: str,
-    max_claimable_amount: float,
+    max_claimable_amount: float | str,
     currency: str,
-    console: Console
+    console: Console,
 ) -> None:
     """Display summarised expense report grouped by date"""
     formatted_report_df = utils.json_to_formatted_summary_df(
-        report_path, max_claimable_amount, currency)
+        report_path, max_claimable_amount, currency
+    )
 
     table = utils.create_table("Summary Report", report_name)
-    table = utils.populate_summary_table(
-        table, formatted_report_df)
-    table = utils.populate_summary_table_totals(
-        table, formatted_report_df)
+    table = utils.populate_summary_table(table, formatted_report_df)
+    table = utils.populate_summary_table_totals(table, formatted_report_df)
     print()
     console.print(table)
 
 
-def display_report(report_path: str, report_name: str, currency: str, console: Console) -> None:
+def display_report(
+    report_path: str, report_name: str, currency: str, console: Console
+) -> None:
     """Display expense report"""
-    formatted_df = utils.json_to_formatted_report_df(
-        report_path, currency)
+    formatted_df = utils.json_to_formatted_report_df(report_path, currency)
 
     table = utils.create_table("Expense Report", report_name)
-    table = utils.populate_report_table(
-        table, formatted_df)
-    table = utils.populate_report_table_total(
-        table, formatted_df)
+    table = utils.populate_report_table(table, formatted_df)
+    table = utils.populate_report_table_total(table, formatted_df)
     print()
     console.print(table)
 
@@ -105,8 +101,7 @@ def delete_report(report_path: str, report_name: str, console: Console) -> None:
     """Delete a specified report"""
     try:
         os.remove(report_path)
-        console.print(
-            f"\n[bold #50FA7B]Successfully removed report: '{report_name}'")
+        console.print(f"\n[bold #50FA7B]Successfully removed report: '{report_name}'")
     except FileNotFoundError:
         print("Error: Report does not exist")
 
@@ -114,15 +109,15 @@ def delete_report(report_path: str, report_name: str, console: Console) -> None:
 def export_report_to_xlsx(
     report_name: str,
     report_path: str,
-    max_claimable_amount: float,
+    max_claimable_amount: float | str,
     currency: str,
-    console: Console
+    console: Console,
 ) -> None:
     """Export report to Excel spreadsheet"""
-    report_df = utils.json_to_formatted_report_df(
-        report_path, currency)
+    report_df = utils.json_to_formatted_report_df(report_path, currency)
     summary_df = utils.json_to_formatted_summary_df(
-        report_path, max_claimable_amount, currency)
+        report_path, max_claimable_amount, currency
+    )
 
     export_dir = user_input.prompt_export_dir()
     if export_dir is None:
@@ -137,25 +132,26 @@ def export_report_to_xlsx(
         if not overwrite:
             sys.exit(1)
 
-    utils.parse_report_to_xlsx(
-        report_df, summary_df, path)
-    console.print(f"[bold #50FA7B]Exported Expense Report '{
-        report_name}' to {export_dir}")
+    utils.parse_report_to_xlsx(report_df, summary_df, path)
+    console.print(
+        f"[bold #50FA7B]Exported Expense Report '{
+        report_name}' to {export_dir}"
+    )
 
 
 def set_config_setting(
-        config: dict[str, str] | float,
-        setting_name: str,
-        args_value: str | float,
-        console: Console
+    config: dict[str, str] | float,
+    setting_name: str,
+    args_value: str | float,
+    console: Console,
 ) -> None:
     """Change a config setting value"""
     config[setting_name] = args_value
     config_manager.save_config(config)
     if setting_name == "max_claimable_amount":
-        console.print(f"\n[bold #50FA7B]Max daily claimable amount set to: {
+        console.print(
+            f"\n[bold #50FA7B]Max daily claimable amount set to: {
             args_value}"
         )
     elif setting_name == "currency":
-        console.print(
-            f"\n[bold #50FA7B]Currency set to: '{args_value}'")
+        console.print(f"\n[bold #50FA7B]Currency set to: '{args_value}'")

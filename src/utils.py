@@ -182,13 +182,21 @@ def json_to_formatted_summary_df(
     return final_formatted_df
 
 
+class Colours:
+    """Colours to be used in table"""
+
+    deep_teal = "#005F73"
+    muted_coral = "bold #EE9B00"
+    soft_sand = "#E9D8A6"
+    muted_gold = "bold #CDAE6D"
+
+
 def create_table(title_prefix: str, report_name: str) -> Table:
     """Creates table object and sets the colours"""
-    # Dracula Purple - #BD93F9        Dracula green - #50FA7B
     table = Table(
         title=f"{title_prefix}: {report_name}",
-        header_style="bold #BD93F9",
-        border_style="#50FA7B",
+        header_style=Colours.muted_coral,
+        border_style=Colours.deep_teal,
     )
     return table
 
@@ -204,7 +212,7 @@ def populate_report_table(table: Table, report_df: pd.DataFrame) -> Table:
     for index, row in report_df[:-1].iterrows():
         table.add_row(
             *[str(index + 1), row["Date"], row["Amount"], row["Description"]],
-            style="bold #F859A8",
+            style=Colours.soft_sand,
         )
         # Add a line between each row
         table.add_section()
@@ -216,7 +224,7 @@ def populate_report_table_total(table: Table, report_df: pd.DataFrame) -> Table:
     # Add extra line after report data rows
     table.add_section()
     total_amount = report_df["Amount"].iloc[-1]
-    table.add_row(*["", "", total_amount], style="bold yellow")
+    table.add_row(*["", "", total_amount], style=Colours.muted_gold)
     return table
 
 
@@ -235,7 +243,8 @@ def populate_summary_table(table: Table, summary_df: pd.DataFrame) -> Table:
     ]
     for i in range(len(summary_df) - 1):
         table.add_row(
-            *[str(lst_data[0][i]), lst_data[1][i], lst_data[2][i]], style="bold #F859A8"
+            *[str(lst_data[0][i]), lst_data[1][i], lst_data[2][i]],
+            style=Colours.soft_sand,
         )
         # Add a line between each row
         table.add_section()
@@ -248,7 +257,7 @@ def populate_summary_table_totals(table: Table, summary_df: pd.DataFrame) -> Tab
     table.add_section()
     grand_total = summary_df["Total"].iloc[-1]
     claimable_total = summary_df["Claimable Total"].iloc[-1]
-    table.add_row(*["", grand_total, claimable_total], style="bold yellow")
+    table.add_row(*["", grand_total, claimable_total], style=Colours.muted_gold)
     return table
 
 

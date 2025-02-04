@@ -3,8 +3,8 @@
 import argparse
 import os
 import re
-import utils
-import user_input
+from src import utils
+from src import user_input
 
 
 def new_expense_report_name(filename):

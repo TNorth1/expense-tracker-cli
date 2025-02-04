@@ -4,9 +4,9 @@ import os
 import sys
 import pandas as pd
 from rich.console import Console
-import config_manager
-import utils
-import user_input
+from src import config_manager
+from src import utils
+from src import user_input
 
 
 def create_new_report(storage_directory: str, filename: str, console: Console) -> None:

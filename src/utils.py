@@ -4,18 +4,12 @@ import os
 import json
 import pandas as pd
 from rich.table import Table
-
-
-def get_storage_directory() -> str:
-    """Returns absolute path of report storage directory"""
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    storage_directory = os.path.join(os.path.dirname(current_directory), ".reports")
-    return storage_directory
+from src import config_manager
 
 
 def init_storage_directory() -> str:
     """Initialise storage directory for main"""
-    storage_directory = get_storage_directory()
+    storage_directory = config_manager.AppInfo.report_dir
     os.makedirs(storage_directory, exist_ok=True)
     return storage_directory
 

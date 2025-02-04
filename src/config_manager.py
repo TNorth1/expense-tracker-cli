@@ -2,6 +2,7 @@
 
 import json
 import os
+from platformdirs import user_config_dir, user_data_dir
 from rich.console import Console
 from src import user_input
 from src import commands
@@ -14,31 +15,36 @@ DEFAULT_CONFIG_SETTINGS = {
 }
 
 
-def get_config_path() -> str:
-    """Returns .config.json absolute path"""
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    config_path = os.path.join(os.path.dirname(current_directory), ".config.json")
-    return config_path
+class AppInfo:
+    """Stores application info"""
+
+    app_name = "expense-tracker-cli"
+    report_dir = os.path.join(user_data_dir(app_name), "reports")
+    config_dir = user_config_dir(app_name)
+    config_path = os.path.join(config_dir, "config.json")
 
 
 def load_config() -> dict[str, str | float] | None:
     """Load config data if the file exists else returns None"""
+    if not os.path.exists(AppInfo.config_dir):
+        os.makedirs(AppInfo.config_dir)
+
     try:
-        with open(get_config_path(), "r") as config_file:
+        with open(AppInfo.config_path, "r") as config_file:
             return json.load(config_file)
     except FileNotFoundError:
         return None
 
 
 def save_config(config: dict[str, str | float]) -> None:
-    """Update .config.json with new config data"""
-    with open(get_config_path(), "w") as config_file:
+    """Update config.json with new config data"""
+    with open(AppInfo.config_path, "w") as config_file:
         json.dump(config, config_file, indent=4)
 
 
 def validate_config_keys(config: dict[str, str | float]) -> dict[str, str | float]:
     """
-    Check if all keys in .config.json are valid.
+    Check if all keys in config.json are valid.
     If a config key is missing, add it to config.
     """
     for key in DEFAULT_CONFIG_SETTINGS:
@@ -48,7 +54,7 @@ def validate_config_keys(config: dict[str, str | float]) -> dict[str, str | floa
 
 
 def set_default_config_settings() -> None:
-    """Reset .config.json to default settings"""
+    """Reset config.json to default settings"""
     config = DEFAULT_CONFIG_SETTINGS
     save_config(config)
 

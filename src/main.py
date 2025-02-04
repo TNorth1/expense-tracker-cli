@@ -3,10 +3,10 @@
 
 import os
 from rich.console import Console
-from src import cli_args
-from src import config_manager
-from src import utils
-from src import commands
+import cli_args
+import config_manager
+import utils
+import commands
 
 
 def main():

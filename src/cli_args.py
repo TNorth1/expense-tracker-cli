@@ -3,8 +3,8 @@
 import argparse
 import os
 import re
-from src import utils
-from src import user_input
+import utils
+import user_input
 
 
 def new_expense_report_name(filename):
@@ -57,8 +57,7 @@ def is_valid_currency(currency):
     """Validates input for set-currency subcommand arg"""
     if user_input.is_valid_currency(currency):
         return currency
-    raise argparse.ArgumentTypeError(
-        f"'{currency}' is not a valid currency symbol")
+    raise argparse.ArgumentTypeError(f"'{currency}' is not a valid currency symbol")
 
 
 def parse_arguments():
@@ -104,8 +103,7 @@ def parse_arguments():
     subparser.add_parser("ls", help="List all expense reports")
 
     # Subcommand 'rm'
-    rm_parser = subparser.add_parser(
-        "rm", help="Remove a specified expense report")
+    rm_parser = subparser.add_parser("rm", help="Remove a specified expense report")
     rm_parser.add_argument(
         "filename",
         type=is_valid_expense_report,

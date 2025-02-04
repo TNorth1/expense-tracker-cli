@@ -3,8 +3,8 @@
 import json
 import os
 from rich.console import Console
-from src import user_input
-from src import commands
+import user_input
+import commands
 
 
 DEFAULT_CONFIG_VALUE = "NOT_SET"

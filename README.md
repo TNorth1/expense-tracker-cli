@@ -30,6 +30,10 @@ A command-line expense tracker that helps you track your expenses.
 
 ### Basic Commands
 
+#### Display help page
+
+``exptrack --help``
+
 #### Create a new expense report
 
 ``exptrack create <report-name>``

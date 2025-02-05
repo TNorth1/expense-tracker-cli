@@ -92,9 +92,9 @@ Example:
 ## Dependencies
 
 - pandas: Data manipulation and Excel export
-- PyQt5: File dialog windows for export functionality
 - rich: Terminal formatting and tables
 - platformdirs: Saving config/report files in platform specific directories
+- XlsxWriter: Exporting reports to xlsx files
 
 ## License
 

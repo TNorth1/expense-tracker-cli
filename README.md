@@ -14,15 +14,27 @@ A command-line expense tracker that helps you track your expenses.
 
 ## Installation
 
-1. Clone the repository:
+1. Install the Tkinter dependency (if not already included):
+
+- Debian/Ubuntu-based distributions:
+
+``sudo apt install python3-tk``
+
+- RHEL/Fedora-based distributions:
+
+``sudo dnf install python3-tkinter``
+
+- Windows and macOS: Tkinter is included with python by default
+
+2. Clone the repository:
 
 ``git clone https://github.com/TNorth1/expense-tracker-cli.git``
 
-2. Navigate to the project directory:
+3. Navigate to the project directory:
 
 ``cd expense-tracker-cli``
 
-3. Install the package:
+4. Install the package:
 
 ``pip install .``
 
@@ -103,6 +115,7 @@ Example:
 - rich: Terminal formatting and tables
 - platformdirs: Saving config/report files in platform specific directories
 - XlsxWriter: Exporting reports to xlsx files
+- Tkinter: File Dialog GUI
 
 ## License
 

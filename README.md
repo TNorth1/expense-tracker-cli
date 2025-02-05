@@ -84,6 +84,10 @@ Example:
 
 ``exptrack set-currency £``
 
+#### View config settings
+
+``exptrack view-config``
+
 ## File Storage
 
 * Expense reports are stored as JSON files in the `reports` directory located at `~/.local/share/expense-tracker-cli/reports`

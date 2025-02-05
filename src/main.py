@@ -57,6 +57,8 @@ def main():
     elif args.command == 'set-currency':
         commands.set_config_setting(
             config, 'currency', args.currency, console)
+    elif args.command == 'view-config':
+        commands.view_config(config)
 
 
 if __name__ == "__main__":

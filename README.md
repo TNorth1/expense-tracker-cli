@@ -88,6 +88,10 @@ Example:
 
 ``exptrack set-currency £``
 
+#### View config settings
+
+``exptrack view-config``
+
 ## File Storage
 
 * Expense reports are stored as JSON files in the `reports` directory located at `~/.local/share/expense-tracker-cli/reports`
@@ -96,9 +100,9 @@ Example:
 ## Dependencies
 
 - pandas: Data manipulation and Excel export
-- PyQt5: File dialog windows for export functionality
 - rich: Terminal formatting and tables
 - platformdirs: Saving config/report files in platform specific directories
+- XlsxWriter: Exporting reports to xlsx files
 
 ## License
 

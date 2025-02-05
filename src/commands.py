@@ -140,7 +140,7 @@ def export_report_to_xlsx(
 
 
 def set_config_setting(
-    config: dict[str, str] | float,
+    config: dict[str, str | float],
     setting_name: str,
     args_value: str | float,
     console: Console,
@@ -155,3 +155,10 @@ def set_config_setting(
         )
     elif setting_name == "currency":
         console.print(f"\n[bold #50FA7B]Currency set to: '{args_value}'")
+
+
+def view_config(config: dict[str, str | float]):
+    """Display the config settings in terminal"""
+    print("\nConfig settings:\n")
+    for key, value in config.items():
+        print(f" - {key}: {value}")

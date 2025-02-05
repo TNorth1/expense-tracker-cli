@@ -2,8 +2,8 @@
 
 from datetime import datetime
 import re
-from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox
-from PyQt5.QtCore import QStandardPaths
+import tkinter as tk
+from tkinter import filedialog, messagebox
 
 
 VALID_MONEY_FORMAT = r'^\d+(\.\d{2})?$'
@@ -108,27 +108,26 @@ def continue_adding_expenses() -> bool:
 
 def prompt_export_dir() -> str | None:
     """Prompt user to select directory for file export"""
-    # Open file explorer gui in downloads directory (platform agnostic)
-    default_download_path = QStandardPaths.writableLocation(
-        QStandardPaths.DownloadLocation
-    )
-    app = QApplication([])  # Create the application object
-    export_dir = QFileDialog.getExistingDirectory(
-        None, "Select a Directory", default_download_path
+    # Init Tkinter root widget
+    root = tk.Tk()
+    root.withdraw()  # Hide the root window
+
+    default_download_path = filedialog.askdirectory(
+        initialdir="~/Downloads", title="Select a Directory"
     )
 
-    if export_dir:
-        return export_dir
+    if default_download_path:
+        return default_download_path
     return None
 
 
 def prompt_file_overwrite(exported_file_path) -> bool:
     """Ask user for confirmation to overwrite existing file"""
-    app = QApplication([])
-    msg_box = QMessageBox()
-    msg_box.setIcon(QMessageBox.Warning)
-    msg_box.setWindowTitle("File Exists")
-    msg_box.setText(f"{exported_file_path} already exists. Overwrite?")
-    msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-    reply = msg_box.exec_()
-    return reply == QMessageBox.Yes
+    # Init the Tkinter root widget
+    root = tk.Tk()
+    root.withdraw()  # Hide the root window
+
+    reply = messagebox.askyesno(
+        "File Exists", f"{exported_file_path} already exists. Overwrite?"
+    )
+    return reply

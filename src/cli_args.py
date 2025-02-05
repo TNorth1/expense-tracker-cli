@@ -144,4 +144,7 @@ def parse_arguments():
         help="The currency symbol to be used in reports",
     )
 
+    # Subcommand 'view-config'
+    subparser.add_parser("view-config", help="View the config settings")
+
     return parser.parse_args()

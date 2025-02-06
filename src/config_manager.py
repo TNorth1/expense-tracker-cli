@@ -6,6 +6,7 @@ from platformdirs import user_config_dir, user_data_dir
 from rich.console import Console
 from src import user_input
 from src import commands
+from src import utils
 
 
 DEFAULT_CONFIG_VALUE = "NOT_SET"
@@ -78,7 +79,7 @@ def init_max_claimable_amount(
     """Initialise max claimable amount for use in main"""
     max_claimable_amount = config["max_claimable_amount"]
     if max_claimable_amount == DEFAULT_CONFIG_VALUE:
-        console.print("\n[bold #FF5555] Max claimable amount is not set\n")
+        console.print(f"\n[{utils.Colours.error}] Max claimable amount is not set\n")
         max_claimable_amount = user_input.prompt_for_max_claimable_amount()
         commands.set_config_setting(
             config, "max_claimable_amount", max_claimable_amount, console
@@ -90,7 +91,7 @@ def init_currency(config: dict[str, str | float], console: Console) -> str:
     """Initialises currency symbol for use in main"""
     currency = config["currency"]
     if currency == DEFAULT_CONFIG_VALUE:
-        console.print("\n[bold #FF5555] The currency symbol is not set\n")
+        console.print(f"\n[{utils.Colours.error}] The currency symbol is not set\n")
         currency = user_input.prompt_for_currency()
         commands.set_config_setting(config, "currency", currency, console)
     return currency

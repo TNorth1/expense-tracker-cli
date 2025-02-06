@@ -21,7 +21,7 @@ def create_new_report(storage_directory: str, filename: str, console: Console) -
     df_columns = pd.DataFrame(columns)
     utils.save_expense_report(df_columns, path)
 
-    console.print(f"\n[bold #50FA7B]Created new report: '{filename}'")
+    console.print(f"\n[{utils.Colours.success}]Created new report: '{filename}'")
 
 
 def display_summary(
@@ -71,15 +71,15 @@ def list_reports(storage_directory: str, console: Console) -> None:
     report_names = os.listdir(storage_directory)
     # if the report directory is empty
     if report_names == []:
-        console.print("[bold #FF5555]There are no reports to list")
+        console.print(f"[{utils.Colours.error}]There are no reports to list")
         sys.exit(1)
 
     # remove extensions from expense reports
     formatted_report_names = [file.split(".")[0] for file in report_names]
 
-    console.print("\n[#50FA7B]Expense Reports:\n")
+    console.print(f"\n[{utils.Colours.header}]Expense Reports:\n")
     for report in formatted_report_names:
-        console.print(f"  [bold #BD93F9]- {report}")
+        console.print(f"[{utils.Colours.body}]  - {report}")
 
 
 def handle_rm_row(row_id: int, report_path: str, console: Console) -> None:
@@ -89,19 +89,21 @@ def handle_rm_row(row_id: int, report_path: str, console: Console) -> None:
     try:
         report = utils.rm_row(row_id, report)
     except KeyError:
-        console.print(f"[bold #FF5555]Report ID '{row_id}' does not exist")
+        console.print(f"[{utils.Colours.error}]Report ID '{row_id}' does not exist")
         sys.exit(1)
 
     report_df = pd.DataFrame(report).reset_index(drop=True)
     utils.save_expense_report(report_df, report_path)
-    console.print(f"[bold #50FA7B]Deleted Report ID: {row_id}")
+    console.print(f"[{utils.Colours.success}]Deleted Report ID: {row_id}")
 
 
 def delete_report(report_path: str, report_name: str, console: Console) -> None:
     """Delete a specified report"""
     try:
         os.remove(report_path)
-        console.print(f"\n[bold #50FA7B]Successfully removed report: '{report_name}'")
+        console.print(
+            f"\n[{utils.Colours.success}]Successfully removed report: '{report_name}'"
+        )
     except FileNotFoundError:
         print("Error: Report does not exist")
 
@@ -121,7 +123,7 @@ def export_report_to_xlsx(
 
     export_dir = user_input.prompt_export_dir()
     if export_dir is None:
-        console.print("[bold #FF5555]No Directory selected")
+        console.print(f"[{utils.Colours.error}]No Directory selected")
         sys.exit(1)
 
     output_file = f"{report_name}.xlsx"
@@ -134,7 +136,7 @@ def export_report_to_xlsx(
 
     utils.parse_report_to_xlsx(report_df, summary_df, path)
     console.print(
-        f"[bold #50FA7B]Exported Expense Report '{
+        f"[{utils.Colours.success}]Exported Expense Report '{
         report_name}' to {export_dir}"
     )
 
@@ -150,15 +152,15 @@ def set_config_setting(
     config_manager.save_config(config)
     if setting_name == "max_claimable_amount":
         console.print(
-            f"\n[bold #50FA7B]Max daily claimable amount set to: {
+            f"\n[{utils.Colours.success}]Max daily claimable amount set to: {
             args_value}"
         )
     elif setting_name == "currency":
-        console.print(f"\n[bold #50FA7B]Currency set to: '{args_value}'")
+        console.print(f"\n[{utils.Colours.success}]Currency set to: '{args_value}'")
 
 
-def view_config(config: dict[str, str | float]):
+def view_config(config: dict[str, str | float], console: Console):
     """Display the config settings in terminal"""
-    print("\nConfig settings:\n")
+    console.print(f"[{utils.Colours.header}]\nConfig settings:\n")
     for key, value in config.items():
-        print(f" - {key}: {value}")
+        console.print(f"[{utils.Colours.body}] - {key}: {value}")

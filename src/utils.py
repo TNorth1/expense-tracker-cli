@@ -177,12 +177,15 @@ def json_to_formatted_summary_df(
 
 
 class Colours:
-    """Colours to be used in table"""
+    """Colours to be used in table and success/error messages"""
 
     border = "#005F73"  # Deep teal
     header = "bold #EE9B00"  # Muted coral
     body = "#E9D8A6"  # Soft sand
     total = "bold #CDAE6D"  # Muted gold
+    
+    success = "bold green"
+    error = "bold red"
 
 
 def create_table(title_prefix: str, report_name: str) -> Table:

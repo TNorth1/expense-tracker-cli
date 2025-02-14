@@ -1,20 +1,70 @@
 """Module for handling user input and validation in expense tracking system"""
 
 from datetime import datetime
+from decimal import Decimal, localcontext
 import re
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
 
-VALID_MONEY_FORMAT = r'^\d+(\.\d{2})?$'
-VALID_DATE_FORMAT = '%Y-%m-%d'
+VALID_MONEY_FORMAT = r"^\d+(\.\d{2})?$"
+VALID_DATE_FORMAT = "%Y-%m-%d"
 VALID_CURRENCIES = {
-    "د.ج", "P", "£", "ج.م", "Br", "₵", "KSh", "د.م.", "₦", "R",
-    "د.ت", "֏", "৳", "Nu.", "¥", "元", "HK$", "₹", "Rp", "₪",
-    "₸", "د.ك", "RM", "ر.ع.", "₱", "ر.ق", "ر.س", "S$", "₩", "₫",
-    "฿", "₭", "៛", "€", "$", "C$", "A$", "NZ$", "CHF", "руб",
-    "₴", "₼", "₺", "₾", "L", "₣"
+    "د.ج",
+    "P",
+    "£",
+    "ج.م",
+    "Br",
+    "₵",
+    "KSh",
+    "د.م.",
+    "₦",
+    "R",
+    "د.ت",
+    "֏",
+    "৳",
+    "Nu.",
+    "¥",
+    "元",
+    "HK$",
+    "₹",
+    "Rp",
+    "₪",
+    "₸",
+    "د.ك",
+    "RM",
+    "ر.ع.",
+    "₱",
+    "ر.ق",
+    "ر.س",
+    "S$",
+    "₩",
+    "₫",
+    "฿",
+    "₭",
+    "៛",
+    "€",
+    "$",
+    "C$",
+    "A$",
+    "NZ$",
+    "CHF",
+    "руб",
+    "₴",
+    "₼",
+    "₺",
+    "₾",
+    "L",
+    "₣",
 }
+
+
+def money_value_to_decimal(value: str) -> Decimal:
+    """Convert a str monetary value to decimal"""
+    with localcontext() as ctx:
+        ctx.prec = 28
+        ctx.rounding = "ROUND_HALF_UP"
+        return Decimal(value).quantize(Decimal("0.01"))
 
 
 def is_valid_date(date_str: str) -> bool:
@@ -36,7 +86,7 @@ def is_valid_currency(currency: str) -> bool:
     return currency in VALID_CURRENCIES
 
 
-def prompt_for_max_claimable_amount() -> float:
+def prompt_for_max_claimable_amount() -> str:
     """Prompt for maximum daily claimable amount"""
     while True:
         print("Enter maximum daily claim amount")
@@ -45,7 +95,7 @@ def prompt_for_max_claimable_amount() -> float:
         if max_claimable_amount == "unlimited":
             return max_claimable_amount
         if is_valid_monetary_value(max_claimable_amount):
-            return float(max_claimable_amount)
+            return max_claimable_amount
 
 
 def prompt_for_currency() -> str:
@@ -70,14 +120,14 @@ def get_date_for_report() -> str:
             return date
 
 
-def prompt_for_expense_cost() -> float:
+def prompt_for_expense_cost() -> str:
     """Prompt for expense cost"""
     while True:
         print("Enter cost of expense")
         print("Format: Whole number or 2 decimals (50 or 50.01)")
         expense_cost = input("Cost: ")
         if is_valid_monetary_value(expense_cost):
-            return float(expense_cost)
+            return expense_cost
 
 
 def prompt_for_expense_description() -> str:

@@ -2,8 +2,6 @@
 
 import argparse
 import os
-import re
-from src import utils
 from src import user_input
 from src import config_manager
 
@@ -42,16 +40,16 @@ def is_valid_expense_report(filename):
     return filename
 
 
-def is_valid_arg_amount(value):
+def is_valid_arg_amount(value: str) -> str:
     """Validates input for set-max subcommand arg"""
     # if provided argument is not a valid monetary value, raise error
     if value == "unlimited":
         return value
-    if re.match(r"^\d+(\.\d{2})?$", value) is None:
+    if not user_input.is_valid_monetary_value(value):
         raise argparse.ArgumentTypeError(
             f"{value} is invalid. Enter valid value i.e. '10' or '10.01' or unlimited"
         )
-    return float(value)
+    return value
 
 
 def is_valid_currency(currency):

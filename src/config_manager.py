@@ -75,7 +75,7 @@ def init_config() -> dict[str, str | float]:
 
 def init_max_claimable_amount(
     config: dict[str, str | float], console: Console
-) -> float:
+) -> str:
     """Initialise max claimable amount for use in main"""
     max_claimable_amount = config["max_claimable_amount"]
     if max_claimable_amount == DEFAULT_CONFIG_VALUE:

@@ -95,21 +95,19 @@ def add_summary_totals_row(report_df: pd.DataFrame) -> pd.DataFrame:
 
 def df_add_total_row(report_df: pd.DataFrame) -> pd.DataFrame:
     """Add total amount row to the report"""
-    total = report_df["Amount"].sum().round(2)
+    total = report_df["Amount"].sum()
     total_row = {"Date": "", "Amount": total, "Description": ""}
     report_df.loc[len(report_df)] = total_row
     return report_df
 
 
 def format_currency(value: float, currency: str) -> str:
-    """Format a float to a monetary value with prefixed currency symbol"""
-    # if value float is a digit e.g. 10.0 value -> £10
-    # else value float e.g. 10.01 -> £10.01
-    return f"{currency}{int(value) if value == int(value) else round(value, 2)}"
+    """Add prefixed currency symbol to value"""
+    return f"{currency}{value}"
 
 
 def format_report_data(report_df: pd.DataFrame, currency: str) -> pd.DataFrame:
-    """Format report rows e.g. 9.0 -> £9"""
+    """Format report rows e.g. 9.00 -> £9.00"""
     report_df["Amount"] = report_df["Amount"].apply(
         lambda x: format_currency(x, currency)
     )
@@ -126,7 +124,7 @@ def format_grand_total_cell(
 
 
 def format_summary_data(summary_df: pd.DataFrame, currency: str) -> pd.DataFrame:
-    """Format report summary rows e.g 9.0 -> £9"""
+    """Format report summary rows e.g 9.00 -> £9.00"""
     summary_df["Total"] = summary_df["Total"].apply(
         lambda x: format_currency(x, currency)
     )

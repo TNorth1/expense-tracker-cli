@@ -5,6 +5,7 @@ import json
 import pandas as pd
 from rich.table import Table
 from src import config_manager
+from src import user_input
 
 
 def init_storage_directory() -> str:
@@ -27,6 +28,12 @@ def save_expense_report(report: pd.DataFrame, report_path: str) -> None:
     """Save expense report"""
     with open(report_path, "w") as report_file:
         report.to_json(report_file, indent=4)
+
+
+def str_to_decimal_df_column(report: pd.DataFrame) -> pd.DataFrame:
+    """Convert report 'amount' column type to decimal"""
+    report["Amount"] = report["Amount"].apply(user_input.money_value_to_decimal)
+    return report
 
 
 def init_new_expense(expense_data: tuple[str, float, str]) -> dict[str, str | float]:
@@ -79,8 +86,8 @@ def add_claimable_total(
 
 def add_summary_totals_row(report_df: pd.DataFrame) -> pd.DataFrame:
     """Add row containing grand total and claimable grand total to the summary report"""
-    grand_total = report_df["Total"].sum().round(2)
-    claimable_total = report_df["Claimable Total"].sum().round(2)
+    grand_total = report_df["Total"].sum()
+    claimable_total = report_df["Claimable Total"].sum()
     totals_row = {"Date": "", "Total": grand_total, "Claimable Total": claimable_total}
     report_df.loc[len(report_df)] = totals_row
     return report_df
@@ -143,6 +150,7 @@ def json_to_formatted_report_df(report_path: str, currency: str) -> pd.DataFrame
         raise FileNotFoundError("Error: Report does not exist")
 
     df = pd.DataFrame(report_data)
+    df = str_to_decimal_df_column(df)
     df_sorted = df.sort_values(by="Date").reset_index(drop=True)
     df_plus_total = df_add_total_row(df_sorted)
 
@@ -161,6 +169,7 @@ def json_to_formatted_summary_df(
         raise FileNotFoundError("Error: Report does not exist")
 
     df = pd.DataFrame(report_data)
+    df = str_to_decimal_df_column(df)
     df_minus_descrip = rm_description(df)
     df_grouped = group_by_date(df_minus_descrip)
     df_plus_claim_tot = add_claimable_total(df_grouped, max_claimable_amount)
@@ -183,7 +192,7 @@ class Colours:
     header = "bold #EE9B00"  # Muted coral
     body = "#E9D8A6"  # Soft sand
     total = "bold #CDAE6D"  # Muted gold
-    
+
     success = "bold green"
     error = "bold red"
 

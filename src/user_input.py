@@ -139,7 +139,7 @@ def prompt_for_expense_description() -> str:
             return description
 
 
-def get_report_data() -> tuple[str, float, str]:
+def get_report_data() -> tuple[str, str, str]:
     """Get expense report data from user input"""
     date = get_date_for_report()
     expense_cost = prompt_for_expense_cost()

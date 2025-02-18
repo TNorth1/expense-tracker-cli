@@ -27,7 +27,7 @@ def create_new_report(storage_directory: str, filename: str, console: Console) -
 def display_summary(
     report_path: str,
     report_name: str,
-    max_claimable_amount: float | str,
+    max_claimable_amount: str,
     currency: str,
     console: Console,
 ) -> None:
@@ -111,7 +111,7 @@ def delete_report(report_path: str, report_name: str, console: Console) -> None:
 def export_report_to_xlsx(
     report_name: str,
     report_path: str,
-    max_claimable_amount: float | str,
+    max_claimable_amount: str,
     currency: str,
     console: Console,
 ) -> None:
@@ -142,9 +142,9 @@ def export_report_to_xlsx(
 
 
 def set_config_setting(
-    config: dict[str, str | float],
+    config: dict[str, str],
     setting_name: str,
-    args_value: str | float,
+    args_value: str,
     console: Console,
 ) -> None:
     """Change a config setting value"""
@@ -159,7 +159,7 @@ def set_config_setting(
         console.print(f"\n[{utils.Colours.success}]Currency set to: '{args_value}'")
 
 
-def view_config(config: dict[str, str | float], console: Console):
+def view_config(config: dict[str, str], console: Console):
     """Display the config settings in terminal"""
     console.print(f"[{utils.Colours.header}]\nConfig settings:\n")
     for key, value in config.items():

@@ -25,7 +25,7 @@ class AppInfo:
     config_path = os.path.join(config_dir, "config.json")
 
 
-def load_config() -> dict[str, str | float] | None:
+def load_config() -> dict[str, str] | None:
     """Load config data if the file exists else returns None"""
     if not os.path.exists(AppInfo.config_dir):
         os.makedirs(AppInfo.config_dir)
@@ -37,13 +37,13 @@ def load_config() -> dict[str, str | float] | None:
         return None
 
 
-def save_config(config: dict[str, str | float]) -> None:
+def save_config(config: dict[str, str]) -> None:
     """Update config.json with new config data"""
     with open(AppInfo.config_path, "w") as config_file:
         json.dump(config, config_file, indent=4)
 
 
-def validate_config_keys(config: dict[str, str | float]) -> dict[str, str | float]:
+def validate_config_keys(config: dict[str, str]) -> dict[str, str]:
     """
     Check if all keys in config.json are valid.
     If a config key is missing, add it to config.
@@ -60,7 +60,7 @@ def set_default_config_settings() -> None:
     save_config(config)
 
 
-def init_config() -> dict[str, str | float]:
+def init_config() -> dict[str, str]:
     """Initialise config for use in main"""
     config = load_config()
     if config is None:
@@ -73,7 +73,7 @@ def init_config() -> dict[str, str | float]:
     return config
 
 
-def init_max_claimable_amount(config: dict[str, str | float], console: Console) -> str:
+def init_max_claimable_amount(config: dict[str, str], console: Console) -> str:
     """Initialise max claimable amount for use in main"""
     max_claimable_amount = config["max_claimable_amount"]
     if max_claimable_amount == DEFAULT_CONFIG_VALUE:
@@ -85,7 +85,7 @@ def init_max_claimable_amount(config: dict[str, str | float], console: Console) 
     return user_input.money_value_to_decimal(max_claimable_amount)
 
 
-def init_currency(config: dict[str, str | float], console: Console) -> str:
+def init_currency(config: dict[str, str], console: Console) -> str:
     """Initialises currency symbol for use in main"""
     currency = config["currency"]
     if currency == DEFAULT_CONFIG_VALUE:

@@ -15,7 +15,7 @@ def init_storage_directory() -> str:
     return storage_directory
 
 
-def load_expense_report(report_path: str) -> dict[str, str | float] | None:
+def load_expense_report(report_path: str) -> dict[str, str] | None:
     """Load the expense report"""
     try:
         with open(report_path, "r") as expense_report:
@@ -36,7 +36,7 @@ def str_to_decimal_df_column(report: pd.DataFrame) -> pd.DataFrame:
     return report
 
 
-def init_new_expense(expense_data: tuple[str, float, str]) -> dict[str, str | float]:
+def init_new_expense(expense_data: tuple[str, str, str]) -> dict[str, str]:
     """Initialise a new expense"""
     expense = {
         "Date": expense_data[0],
@@ -46,7 +46,7 @@ def init_new_expense(expense_data: tuple[str, float, str]) -> dict[str, str | fl
     return expense
 
 
-def add_expense_to_report(expense: dict[str, str | float], report_path: str) -> None:
+def add_expense_to_report(expense: dict[str, str], report_path: str) -> None:
     """Add new expense to expense report"""
     report = load_expense_report(report_path)
     report_df = pd.DataFrame(report)
@@ -73,7 +73,7 @@ def rename_amount_to_total(report_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_claimable_total(
-    report_df: pd.DataFrame, max_claimable_amount: float | str
+    report_df: pd.DataFrame, max_claimable_amount: str
 ) -> pd.DataFrame:
     """Add Claimable Total col to summary report"""
     report_df["Claimable Total"] = report_df["Amount"].apply(
@@ -101,7 +101,7 @@ def df_add_total_row(report_df: pd.DataFrame) -> pd.DataFrame:
     return report_df
 
 
-def format_currency(value: float, currency: str) -> str:
+def format_currency(value: str, currency: str) -> str:
     """Add prefixed currency symbol to value"""
     return f"{currency}{value}"
 
@@ -159,7 +159,7 @@ def json_to_formatted_report_df(report_path: str, currency: str) -> pd.DataFrame
 
 
 def json_to_formatted_summary_df(
-    report_path: str, max_claimable_amount: float | str, currency: str
+    report_path: str, max_claimable_amount: str, currency: str
 ) -> pd.DataFrame:
     """Parse JSON report data to formatted report summary df"""
     report_data = load_expense_report(report_path)

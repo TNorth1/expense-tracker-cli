@@ -1,11 +1,20 @@
 """Module for expense report utility functions"""
 
 import os
+import sys
 import json
 import pandas as pd
 from rich.table import Table
+from rich.console import Console
 from src import config_manager
 from src import user_input
+
+
+def handle_missing_subcommand(console: Console) -> None:
+    """Exits program if no subcommand is provided"""
+    console.print(f"[{Colours.error}]No sub-command provided")
+    print("Use '--help' to see available sub-commands")
+    sys.exit(1)
 
 
 def init_storage_directory() -> str:

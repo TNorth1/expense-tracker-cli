@@ -73,9 +73,7 @@ def init_config() -> dict[str, str | float]:
     return config
 
 
-def init_max_claimable_amount(
-    config: dict[str, str | float], console: Console
-) -> str:
+def init_max_claimable_amount(config: dict[str, str | float], console: Console) -> str:
     """Initialise max claimable amount for use in main"""
     max_claimable_amount = config["max_claimable_amount"]
     if max_claimable_amount == DEFAULT_CONFIG_VALUE:
@@ -84,7 +82,7 @@ def init_max_claimable_amount(
         commands.set_config_setting(
             config, "max_claimable_amount", max_claimable_amount, console
         )
-    return max_claimable_amount
+    return user_input.money_value_to_decimal(max_claimable_amount)
 
 
 def init_currency(config: dict[str, str | float], console: Console) -> str:

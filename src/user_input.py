@@ -151,8 +151,8 @@ def continue_adding_expenses() -> bool:
     """Check if user wants to add another expense entry"""
     while True:
         print("Do you want to add another entry?")
-        response = input("[y/n]: ")
-        if response.lower() in ["y", "n"]:
+        response = input("[y/n]: ").lower()
+        if response in ["y", "n"]:
             return response == "y"
 
 

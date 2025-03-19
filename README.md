@@ -14,7 +14,9 @@ A command-line expense tracker that helps you track your expenses.
 
 ## Installation
 
-1. Install the Tkinter dependency (if not already included):
+**Note: This application has currently only been tested on Linux systems.**
+
+1. Install the Tkinter dependency (if not already installed):
 
 - Debian/Ubuntu-based distributions:
 
@@ -23,8 +25,6 @@ A command-line expense tracker that helps you track your expenses.
 - RHEL/Fedora-based distributions:
 
 ``sudo dnf install python3-tkinter``
-
-- Windows and macOS: Tkinter is included with python by default
 
 2. Clone the repository:
 
@@ -106,8 +106,8 @@ Example:
 
 ## File Storage
 
-* Expense reports are stored as JSON files in the `reports` directory located at `~/.local/share/expense-tracker-cli/reports`
-* Configuration settings are stored in `config.json` located at `~/.config/expense-tracker-cli/config.json`
+- Expense reports are stored as JSON files in the `reports` directory located at `~/.local/share/expense-tracker-cli/reports`
+- Configuration settings are stored in `config.json` located at `~/.config/expense-tracker-cli/config.json`
 
 ## Dependencies
 
@@ -116,6 +116,10 @@ Example:
 - platformdirs: Saving config/report files in platform specific directories
 - XlsxWriter: Exporting reports to xlsx files
 - Tkinter: File Dialog GUI
+
+## Compatibility
+
+This application has currently only been tested on Linux systems. While it may work on other platforms due to the cross-platform libraries used, your experience may vary on Windows or macOS.
 
 ## License
 

@@ -31,36 +31,34 @@ def main():
         max_claimable_amount = config_manager.init_max_claimable_amount(config, console)
         currency = config_manager.init_currency(config, console)
 
-        if args.command == "create":
-            commands.create_new_report(storage_directory, report_name, console)
-        elif args.command == "display":
-            if args.summary:
-                commands.display_summary(
-                    report_path, report_name, max_claimable_amount, currency, console
-                )
-            else:
-                commands.display_report(report_path, report_name, currency, console)
-        elif args.command == "update":
-            commands.add_new_report_entry(report_path)
-        elif args.command == "ls":
-            commands.list_reports(storage_directory, console)
-        elif args.command == "rm":
-            if args.id:
-                commands.handle_rm_row(args.id, report_path, console)
-            else:
-                commands.delete_report(report_path, report_name, console)
-        elif args.command == "export":
-            commands.export_report_to_xlsx(
+        command_dict = {
+            "create": lambda: commands.create_new_report(
+                storage_directory, report_name, console
+            ),
+            "display": lambda: commands.display_summary(
+                report_path, report_name, max_claimable_amount, currency, console
+            )
+            if args.summary
+            else commands.display_report(report_path, report_name, currency, console),
+            "update": lambda: commands.add_new_report_entry(report_path),
+            "ls": lambda: commands.list_reports(storage_directory, console),
+            "rm": lambda: commands.handle_rm_row(args.id, report_path, console)
+            if args.id
+            else commands.delete_report(report_path, report_name, console),
+            "export": lambda: commands.export_report_to_xlsx(
                 report_name, report_path, max_claimable_amount, currency, console
-            )
-        elif args.command == "set-max":
-            commands.set_config_setting(
+            ),
+            "set-max": lambda: commands.set_config_setting(
                 config, "max_claimable_amount", args.max_claimable_amount, console
-            )
-        elif args.command == "set-currency":
-            commands.set_config_setting(config, "currency", args.currency, console)
-        elif args.command == "view-config":
-            commands.view_config(config, console)
+            ),
+            "set-currency": lambda: commands.set_config_setting(
+                config, "currency", args.currency, console
+            ),
+            "view-config": lambda: commands.view_config(config, console),
+        }
+
+        command_dict[args.command]()
+
     except KeyboardInterrupt:
         print()
         sys.exit()

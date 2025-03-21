@@ -135,8 +135,9 @@ def export_report_to_xlsx(
 
     utils.parse_report_to_xlsx(report_df, summary_df, path)
     console.print(
-        f"[{utils.Colours.success}]Exported Expense Report '{
-        report_name}' to {export_dir}"
+        f"[{utils.Colours.success}]Exported Expense Report '{report_name}' to {
+            export_dir
+        }"
     )
 
 
@@ -152,7 +153,8 @@ def set_config_setting(
     if setting_name == "max_claimable_amount":
         console.print(
             f"\n[{utils.Colours.success}]Max daily claimable amount set to: {
-            args_value}"
+                args_value
+            }"
         )
     elif setting_name == "currency":
         console.print(f"\n[{utils.Colours.success}]Currency set to: '{args_value}'")

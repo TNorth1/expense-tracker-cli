@@ -116,6 +116,7 @@ Example:
 - platformdirs: Saving config/report files in platform specific directories
 - XlsxWriter: Exporting reports to xlsx files
 - Tkinter: File Dialog GUI
+- Pydantic: Expense report template using BaseModel
 
 ## Compatibility
 

@@ -13,7 +13,8 @@ setup(
         "pandas>=2.2.3",
         "rich>=13.9.4",
         "platformdirs>=4.3.6",
-        "XlsxWriter>=3.2.0"
+        "XlsxWriter>=3.2.0",
+        "pydantic>=2.0.0"
     ],
     entry_points={
         "console_scripts": ["exptrack=src.main:main"],

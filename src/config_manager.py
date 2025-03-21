@@ -82,7 +82,10 @@ def init_max_claimable_amount(config: dict[str, str], console: Console) -> str:
         commands.set_config_setting(
             config, "max_claimable_amount", max_claimable_amount, console
         )
-    return user_input.money_value_to_decimal(max_claimable_amount)
+    if max_claimable_amount == 'unlimited':
+        return max_claimable_amount
+    else:
+        return user_input.money_value_to_decimal(max_claimable_amount)
 
 
 def init_currency(config: dict[str, str], console: Console) -> str:

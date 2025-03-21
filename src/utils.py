@@ -45,16 +45,6 @@ def str_to_decimal_df_column(report: pd.DataFrame) -> pd.DataFrame:
     return report
 
 
-def init_new_expense(expense_data: tuple[str, str, str]) -> dict[str, str]:
-    """Initialise a new expense"""
-    expense = {
-        "Date": expense_data[0],
-        "Amount": expense_data[1],
-        "Description": expense_data[2],
-    }
-    return expense
-
-
 def add_expense_to_report(expense: dict[str, str], report_path: str) -> None:
     """Add new expense to expense report"""
     report = load_expense_report(report_path)

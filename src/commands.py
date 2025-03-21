@@ -60,8 +60,7 @@ def add_new_report_entry(report_path: str) -> None:
     """Add a new expense to report and ask user to add another expense"""
     continue_adding_expense = True
     while continue_adding_expense:
-        report_data = user_input.get_report_data()
-        expense = utils.init_new_expense(report_data)
+        expense = user_input.get_report_data()
         utils.add_expense_to_report(expense, report_path)
         continue_adding_expense = user_input.continue_adding_expenses()
 

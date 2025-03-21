@@ -5,6 +5,7 @@ from decimal import Decimal, localcontext
 import re
 import tkinter as tk
 from tkinter import filedialog, messagebox
+from pydantic import BaseModel
 
 
 VALID_MONEY_FORMAT = r"^\d+(\.\d{2})?$"
@@ -139,12 +140,20 @@ def prompt_for_expense_description() -> str:
             return description
 
 
-def get_report_data() -> tuple[str, str, str]:
-    """Get expense report data from user input"""
-    date = get_date_for_report()
-    expense_cost = prompt_for_expense_cost()
-    description = prompt_for_expense_description()
-    return date, expense_cost, description
+class ReportDataTemplate(BaseModel):
+    Date: str
+    Amount: str
+    Description: str
+
+
+def get_report_data() -> dict[str, str]:
+    """Get expense report data from user input and convert to a dict"""
+    report_data = ReportDataTemplate(
+        Date=get_date_for_report(),
+        Amount=prompt_for_expense_cost(),
+        Description=prompt_for_expense_description(),
+    )
+    return report_data.model_dump()
 
 
 def continue_adding_expenses() -> bool:

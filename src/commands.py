@@ -59,7 +59,9 @@ def display_report(
 def add_new_report_entry(report_path: str) -> None:
     """Add a new expense to report and ask user to add another expense"""
     while True:
+        print()  # Print blank line between expense entries
         expense = user_input.get_report_data()
+        print()  # Print blank line between expense entry and continue adding prompt
         utils.add_expense_to_report(expense, report_path)
         if not user_input.continue_adding_expenses():
             break
